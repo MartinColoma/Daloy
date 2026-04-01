@@ -1,28 +1,20 @@
-import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuthStore } from "../stores/authStore";
 
-/**
- * PublicLayout
- * Wraps unauthenticated pages: /, /sign-in, /sign-up
- * - Redirects authenticated users to /home
- * - Provides no nav chrome (pages are fully self-contained)
- *
- * TODO: swap the `isAuthenticated` stub with your real Supabase session check
- *       e.g. const { session } = useAuth();
- */
-const isAuthenticated = false; // stub — replace with useAuth()
+/* ─────────────────────────────────────────────
+   PublicLayout.tsx
+   Wraps unauthenticated pages: /, /sign-in, /sign-up.
+   If the user already has a session → redirect to /home.
+   No nav chrome — pages manage their own visuals.
+───────────────────────────────────────────── */
 
 export default function PublicLayout() {
-  const navigate = useNavigate();
+  const isAuthenticated = useAuthStore(s => s.isAuthenticated);
+  const user            = useAuthStore(s => s.user);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/home", { replace: true });
-    }
-  }, [navigate]);
-
-  // Nothing to render while redirecting
-  if (isAuthenticated) return null;
+  if (isAuthenticated) {
+    return <Navigate to={user?.onboardingDone ? "/home" : "/onboarding/currency"} replace />;
+  }
 
   return <Outlet />;
 }

@@ -69,7 +69,7 @@ export default function LandingPage() {
           className="font-lora font-bold text-[1.35rem] tracking-tight no-underline"
           style={{ color: "var(--ink)" }}
         >
-          dal<span style={{ color: "var(--forest)" }}>oy</span>
+          Dalo<span style={{ color: "var(--forest)" }}>y</span>
         </Link>
 
         <div className="flex items-center gap-8">
