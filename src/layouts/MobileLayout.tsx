@@ -4,6 +4,7 @@ import FAB              from "../components/layout/FAB";
 import BottomSheet      from "../components/layout/BottomSheet";
 import QuickActionsSheet from "../components/layout/QuickActionsSheet";
 import { useLayout }    from "./LayoutContext";
+import ModalManager from "../components/modals/ModalManager";
 
 /* ─────────────────────────────────────────────
    MobileLayout.tsx
@@ -31,7 +32,7 @@ export default function MobileLayout() {
         <FAB />
         <BottomNav />
       </div>
-
+      <ModalManager />  
       {/* Quick Actions bottom sheet */}
       <BottomSheet isOpen={quickActionsOpen} onClose={closeQuickActions}>
         <QuickActionsSheet />

@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/layout/Sidebar";
 import TopBar  from "../components/layout/TopBar";
+import ModalManager from "../components/modals/ModalManager";
 
 /* ─────────────────────────────────────────────
    DesktopLayout.tsx
@@ -22,6 +23,7 @@ export default function DesktopLayout() {
           <Outlet />
         </main>
       </div>
+      <ModalManager />  
     </div>
   );
 }

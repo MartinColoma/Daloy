@@ -20,7 +20,7 @@ import StepBudgets      from "../pages/onboarding/StepBudgets";
 
 // App pages
 import HomePage     from "../pages/app/HomePage";
-// import WalletPage   from "../pages/app/WalletPage";
+import WalletPage   from "../pages/app/WalletPage";
 // import HistoryPage  from "../pages/app/HistoryPage";
 // import ProfilePage  from "../pages/app/ProfilePage";
 
@@ -54,7 +54,11 @@ export default function AppRoutes() {
           <Route path="/home" element={<HomePage />} />
         </Route>
       </Route>
-
+      <Route element={<ProtectedLayout />}>
+        <Route element={<RootLayout />}>
+          <Route path="/wallet" element={<WalletPage />} />
+        </Route>
+      </Route>
       {/* ─── Fallback ───────────────────────────────────────────── */}
       <Route path="*" element={<Navigate to="/" replace />} />
 

@@ -2,20 +2,22 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Trash2, ArrowRight, ChevronRight } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
+import { postWallets } from "../../services/onboardingService";
 
 /* ─────────────────────────────────────────────
    StepWallets.tsx — Onboarding Step 2
    Add wallets (BPI, GCash, Maya, Cash, etc.)
    with name, icon, and starting balance.
-   Skippable.
+   Skippable — POSTs [] to /onboarding/wallets
+   before navigating to next step.
 ───────────────────────────────────────────── */
 
 const WALLET_PRESETS = [
-  { name: "Cash",  icon: "💵" },
-  { name: "GCash", icon: "💙" },
-  { name: "Maya",  icon: "💚" },
-  { name: "BPI",   icon: "🏦" },
-  { name: "BDO",   icon: "🏦" },
+  { name: "Cash",      icon: "💵" },
+  { name: "GCash",     icon: "💙" },
+  { name: "Maya",      icon: "💚" },
+  { name: "BPI",       icon: "🏦" },
+  { name: "BDO",       icon: "🏦" },
   { name: "UnionBank", icon: "🏦" },
   { name: "Metrobank", icon: "🏦" },
 ];
@@ -32,13 +34,14 @@ interface WalletEntry {
 export default function StepWallets() {
   const navigate = useNavigate();
   const user     = useAuthStore(s => s.user);
-  const symbol   = user?.baseCurrency === "PHP" ? "₱" : user?.baseCurrency ?? "₱";
+  const symbol   = user?.baseCurrency === "PHP" ? "₱" : (user?.baseCurrency ?? "₱");
 
   const [wallets, setWallets] = useState<WalletEntry[]>([
     { id: crypto.randomUUID(), name: "Cash",  icon: "💵", balance: "0" },
     { id: crypto.randomUUID(), name: "GCash", icon: "💙", balance: "0" },
   ]);
   const [saving, setSaving] = useState(false);
+  const [error,  setError]  = useState<string | null>(null);
 
   function addWallet() {
     setWallets(w => [...w, { id: crypto.randomUUID(), name: "", icon: "💳", balance: "0" }]);
@@ -59,20 +62,27 @@ export default function StepWallets() {
     }
   }
 
-  async function handleContinue() {
+  async function submit(skip: boolean) {
     setSaving(true);
+    setError(null);
     try {
-      const valid = wallets.filter(w => w.name.trim());
-      // TODO: call POST /api/wallets for each entry
-      console.log("Creating wallets:", valid);
+      const payload = skip
+        ? []
+        : wallets
+            .filter(w => w.name.trim())
+            .map(w => ({
+              name:           w.name.trim(),
+              icon:           w.icon,
+              initialBalance: Math.max(0, Number(w.balance) || 0),
+            }));
+
+      await postWallets(payload);
       navigate("/onboarding/budgets");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save wallets. Please try again.");
     } finally {
       setSaving(false);
     }
-  }
-
-  function handleSkip() {
-    navigate("/onboarding/budgets");
   }
 
   return (
@@ -104,8 +114,8 @@ export default function StepWallets() {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-outfit text-[0.75rem] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               style={{
                 background: added ? "var(--forest-bg)" : "var(--bg2)",
-                border: `1.5px solid ${added ? "var(--forest-xl)" : "var(--bg3)"}`,
-                color: added ? "var(--forest-m)" : "var(--ink2)",
+                border:     `1.5px solid ${added ? "var(--forest-xl)" : "var(--bg3)"}`,
+                color:      added ? "var(--forest-m)" : "var(--ink2)",
               }}
             >
               {p.icon} {p.name}
@@ -122,7 +132,7 @@ export default function StepWallets() {
             className="flex items-center gap-3 rounded-[var(--radius-md)] px-4 py-3"
             style={{ background: "var(--bg2)", border: "1px solid var(--bg3)" }}
           >
-            {/* Icon picker — minimal, shows current emoji */}
+            {/* Icon picker */}
             <select
               value={wallet.icon}
               onChange={e => updateWallet(wallet.id, "icon", e.target.value)}
@@ -177,11 +187,8 @@ export default function StepWallets() {
       {/* Add wallet */}
       <button
         onClick={addWallet}
-        className="w-full flex items-center justify-center gap-2 font-outfit text-[0.85rem] py-[0.6rem] rounded-[var(--radius-sm)] mb-6 transition-colors"
-        style={{
-          border: "1.5px dashed var(--bg3)",
-          color: "var(--ink3)",
-        }}
+        className="w-full flex items-center justify-center gap-2 font-outfit text-[0.85rem] py-[0.6rem] rounded-[var(--radius-sm)] mb-4 transition-colors"
+        style={{ border: "1.5px dashed var(--bg3)", color: "var(--ink3)" }}
         onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--forest-xl)"; e.currentTarget.style.color = "var(--forest)"; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--bg3)"; e.currentTarget.style.color = "var(--ink3)"; }}
       >
@@ -189,20 +196,28 @@ export default function StepWallets() {
         Add another wallet
       </button>
 
+      {/* Inline error */}
+      {error && (
+        <p
+          className="font-outfit text-[0.8rem] mb-4 px-1"
+          style={{ color: "var(--expense)" }}
+        >
+          {error}
+        </p>
+      )}
+
       {/* Actions */}
       <div className="flex gap-3">
         <button
-          onClick={handleSkip}
-          className="flex items-center gap-1 font-outfit font-medium text-[0.85rem] px-5 py-[0.65rem] rounded-[var(--radius-sm)] transition-colors"
-          style={{
-            border: "1.5px solid var(--bg3)",
-            color: "var(--ink3)",
-          }}
+          onClick={() => submit(true)}
+          disabled={saving}
+          className="flex items-center gap-1 font-outfit font-medium text-[0.85rem] px-5 py-[0.65rem] rounded-[var(--radius-sm)] transition-colors disabled:opacity-50"
+          style={{ border: "1.5px solid var(--bg3)", color: "var(--ink3)" }}
         >
           Skip <ChevronRight size={14} />
         </button>
         <button
-          onClick={handleContinue}
+          onClick={() => submit(false)}
           disabled={saving}
           className="flex-1 flex items-center justify-center gap-2 font-outfit font-medium text-[0.875rem] text-white py-[0.65rem] rounded-[var(--radius-sm)] transition-colors disabled:opacity-50"
           style={{ background: "var(--forest)" }}

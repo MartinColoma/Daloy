@@ -27,10 +27,10 @@ const ACTIONS: Action[] = [
   { label: "Add Expense",      icon: TrendingDown,      modal: "add-expense",      color: "var(--expense)", bg: "#FBF0F0"           },
   { label: "Log Income",       icon: TrendingUp,        modal: "log-income",       color: "var(--income)",  bg: "var(--forest-bg)"  },
   { label: "Transfer",         icon: ArrowLeftRight,    modal: "transfer",         color: "var(--steel)",   bg: "var(--steel-bg)"   },
-  { label: "Group Expense",    icon: Users,             modal: "group-expense",    color: "var(--steel-m)", bg: "var(--steel-bg)"   },
-  { label: "Convert Currency", icon: RefreshCw,         modal: "convert-currency", color: "var(--gold)",    bg: "var(--gold-bg)"    },
-  { label: "Settle Up",        icon: Handshake,         modal: "settle-up",        color: "var(--income)",  bg: "var(--forest-bg)"  },
   { label: "Budget Limits",    icon: SlidersHorizontal, modal: "budget-limits",    color: "var(--ink2)",    bg: "var(--bg3)"        },
+  { label: "Convert Currency", icon: RefreshCw,         modal: "convert-currency", color: "var(--gold)",    bg: "var(--gold-bg)"    },
+  { label: "Group Expense",    icon: Users,             modal: "group-expense",    color: "var(--steel-m)", bg: "var(--steel-bg)"   },
+  { label: "Settle Up",        icon: Handshake,         modal: "settle-up",        color: "var(--income)",  bg: "var(--forest-bg)"  },
 ];
 
 export default function QuickActionsSheet() {

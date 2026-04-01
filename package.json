@@ -20,6 +20,7 @@
     "axios": "^1.14.0",
     "cors": "^2.8.5",
     "crypto-browserify": "^3.12.1",
+    "date-fns": "^4.1.0",
     "express": "^5.1.0",
     "lucide-react": "^0.468.0",
     "nodemailer": "^7.0.10",

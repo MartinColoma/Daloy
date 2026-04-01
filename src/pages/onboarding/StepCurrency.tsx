@@ -2,56 +2,61 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
+import { patchBaseCurrency } from "../../services/onboardingService";
 
 /* ─────────────────────────────────────────────
    StepCurrency.tsx — Onboarding Step 1
    Pick base currency. Default: PHP.
    Searchable list of common currencies.
-   Saves to public.users.base_currency via API.
+   Saves to public.users.base_currency via PATCH /onboarding/currency.
 ───────────────────────────────────────────── */
 
 const CURRENCIES = [
-  { code: "PHP", name: "Philippine Peso",    symbol: "₱", flag: "🇵🇭" },
-  { code: "USD", name: "US Dollar",          symbol: "$", flag: "🇺🇸" },
-  { code: "EUR", name: "Euro",               symbol: "€", flag: "🇪🇺" },
-  { code: "GBP", name: "British Pound",      symbol: "£", flag: "🇬🇧" },
-  { code: "JPY", name: "Japanese Yen",       symbol: "¥", flag: "🇯🇵" },
-  { code: "SGD", name: "Singapore Dollar",   symbol: "S$",flag: "🇸🇬" },
-  { code: "AUD", name: "Australian Dollar",  symbol: "A$",flag: "🇦🇺" },
-  { code: "CAD", name: "Canadian Dollar",    symbol: "C$",flag: "🇨🇦" },
-  { code: "HKD", name: "Hong Kong Dollar",   symbol: "HK$",flag:"🇭🇰" },
-  { code: "KRW", name: "South Korean Won",   symbol: "₩", flag: "🇰🇷" },
-  { code: "CNY", name: "Chinese Yuan",       symbol: "¥", flag: "🇨🇳" },
-  { code: "INR", name: "Indian Rupee",       symbol: "₹", flag: "🇮🇳" },
-  { code: "MYR", name: "Malaysian Ringgit",  symbol: "RM",flag: "🇲🇾" },
-  { code: "THB", name: "Thai Baht",          symbol: "฿", flag: "🇹🇭" },
-  { code: "IDR", name: "Indonesian Rupiah",  symbol: "Rp",flag: "🇮🇩" },
-  { code: "VND", name: "Vietnamese Dong",    symbol: "₫", flag: "🇻🇳" },
-  { code: "AED", name: "UAE Dirham",         symbol: "د.إ",flag:"🇦🇪"},
-  { code: "SAR", name: "Saudi Riyal",        symbol: "﷼", flag: "🇸🇦" },
+  { code: "PHP", name: "Philippine Peso",    symbol: "₱",   flag: "🇵🇭" },
+  { code: "USD", name: "US Dollar",          symbol: "$",   flag: "🇺🇸" },
+  { code: "EUR", name: "Euro",               symbol: "€",   flag: "🇪🇺" },
+  { code: "GBP", name: "British Pound",      symbol: "£",   flag: "🇬🇧" },
+  { code: "JPY", name: "Japanese Yen",       symbol: "¥",   flag: "🇯🇵" },
+  { code: "SGD", name: "Singapore Dollar",   symbol: "S$",  flag: "🇸🇬" },
+  { code: "AUD", name: "Australian Dollar",  symbol: "A$",  flag: "🇦🇺" },
+  { code: "CAD", name: "Canadian Dollar",    symbol: "C$",  flag: "🇨🇦" },
+  { code: "HKD", name: "Hong Kong Dollar",   symbol: "HK$", flag: "🇭🇰" },
+  { code: "KRW", name: "South Korean Won",   symbol: "₩",   flag: "🇰🇷" },
+  { code: "CNY", name: "Chinese Yuan",       symbol: "¥",   flag: "🇨🇳" },
+  { code: "INR", name: "Indian Rupee",       symbol: "₹",   flag: "🇮🇳" },
+  { code: "MYR", name: "Malaysian Ringgit",  symbol: "RM",  flag: "🇲🇾" },
+  { code: "THB", name: "Thai Baht",          symbol: "฿",   flag: "🇹🇭" },
+  { code: "IDR", name: "Indonesian Rupiah",  symbol: "Rp",  flag: "🇮🇩" },
+  { code: "VND", name: "Vietnamese Dong",    symbol: "₫",   flag: "🇻🇳" },
+  { code: "AED", name: "UAE Dirham",         symbol: "د.إ", flag: "🇦🇪" },
+  { code: "SAR", name: "Saudi Riyal",        symbol: "﷼",   flag: "🇸🇦" },
 ];
 
 export default function StepCurrency() {
-  const navigate   = useNavigate();
-  const user       = useAuthStore(s => s.user);
-  const setUser    = useAuthStore(s => s.setUser);
+  const navigate = useNavigate();
+  const user     = useAuthStore(s => s.user);
+  const setUser  = useAuthStore(s => s.setUser);
 
   const [selected, setSelected] = useState(user?.baseCurrency ?? "PHP");
   const [query,    setQuery]    = useState("");
   const [saving,   setSaving]   = useState(false);
+  const [error,    setError]    = useState<string | null>(null);
 
   const filtered = CURRENCIES.filter(c =>
     c.code.toLowerCase().includes(query.toLowerCase()) ||
-    c.name.toLowerCase().includes(query.toLowerCase())
+    c.name.toLowerCase().includes(query.toLowerCase()),
   );
 
   async function handleContinue() {
     setSaving(true);
+    setError(null);
     try {
-      // TODO: call PATCH /api/users/me { baseCurrency: selected }
-      // For now, optimistically update the store
+      await patchBaseCurrency(selected);
+      // Sync store so subsequent steps have the correct currency symbol
       if (user) setUser({ ...user, baseCurrency: selected });
       navigate("/onboarding/wallets");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save currency. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -88,12 +93,12 @@ export default function StepCurrency() {
           onChange={e => setQuery(e.target.value)}
           className="w-full font-outfit text-[0.875rem] rounded-[var(--radius-sm)] pl-10 pr-4 py-[0.65rem] outline-none transition-colors"
           style={{
-            background: "var(--bg2)",
-            border: "1.5px solid var(--bg3)",
-            color: "var(--ink)",
+            background:   "var(--bg2)",
+            border:       "1.5px solid var(--bg3)",
+            color:        "var(--ink)",
           }}
-          onFocus={e  => { e.currentTarget.style.borderColor = "var(--forest-m)"; }}
-          onBlur={e   => { e.currentTarget.style.borderColor = "var(--bg3)"; }}
+          onFocus={e => { e.currentTarget.style.borderColor = "var(--forest-m)"; }}
+          onBlur={e  => { e.currentTarget.style.borderColor = "var(--bg3)"; }}
         />
       </div>
 
@@ -119,7 +124,7 @@ export default function StepCurrency() {
                   onClick={() => setSelected(c.code)}
                   className="w-full flex items-center gap-3 px-4 py-3 transition-colors text-left"
                   style={{
-                    background: isActive ? "var(--forest-bg)" : i % 2 === 0 ? "var(--bg2)" : "var(--bg)",
+                    background:   isActive ? "var(--forest-bg)" : i % 2 === 0 ? "var(--bg2)" : "var(--bg)",
                     borderBottom: i < filtered.length - 1 ? "1px solid var(--bg3)" : "none",
                   }}
                 >
@@ -153,6 +158,16 @@ export default function StepCurrency() {
           )}
         </div>
       </div>
+
+      {/* Inline error */}
+      {error && (
+        <p
+          className="font-outfit text-[0.8rem] mb-4 px-1"
+          style={{ color: "var(--expense)" }}
+        >
+          {error}
+        </p>
+      )}
 
       {/* Continue button */}
       <button
