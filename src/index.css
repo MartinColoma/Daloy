@@ -1,1 +1,93 @@
+/* 1. Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+/* 2. Tailwind CSS v4 */
 @import "tailwindcss";
+
+/* 3. Register custom fonts so Tailwind generates font-lora, font-outfit, font-mono */
+@theme {
+  --font-lora:   'Lora', serif;
+  --font-outfit: 'Outfit', sans-serif;
+  --font-mono:   'IBM Plex Mono', monospace;
+}
+
+/* 4. Daloy Design System — CSS Variables */
+@layer base {
+  :root {
+    /* ── Backgrounds ── */
+    --bg:        #F5F3EF;
+    --bg2:       #EDEAE4;
+    --bg3:       #E4E0D8;
+
+    /* ── Ink (text) ── */
+    --ink:       #1C1A17;
+    --ink2:      #3D3A34;
+    --ink3:      #6B6760;
+    --ink4:      #9C9890;
+
+    /* ── Forest — primary accent ── */
+    --forest:    #2D5016;
+    --forest-m:  #3D6B20;
+    --forest-l:  #4F8A2B;
+    --forest-xl: #A8C98A;
+    --forest-bg: #EDF2E8;
+
+    /* ── Clay — secondary (warm details) ── */
+    --clay:      #8B4513;
+    --clay-m:    #A0522D;
+    --clay-l:    #C4703F;
+    --clay-bg:   #F5EDE8;
+
+    /* ── Steel — tertiary (info, groups, converter) ── */
+    --steel:     #2C4A6E;
+    --steel-m:   #3A5F8A;
+    --steel-l:   #5A82AF;
+    --steel-bg:  #E8EDF5;
+
+    /* ── Gold — in-progress / warning-light ── */
+    --gold:      #7A5C1E;
+    --gold-l:    #C4913A;
+    --gold-bg:   #FDF6E8;
+
+    /* ── Semantic ── */
+    --income:    #2D6A4F;
+    --expense:   #8B2E2E;
+    --warning:   #7A5C1E;
+    --success:   #2D5016;
+
+    /* ── Shadows ── */
+    --shadow-sm: 0 1px 3px rgba(28, 26, 23, 0.08);
+    --shadow-md: 0 4px 16px rgba(28, 26, 23, 0.10);
+    --shadow-lg: 0 12px 40px rgba(28, 26, 23, 0.12);
+
+    /* ── Radius ── */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+  }
+
+  /* ── Base resets ── */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
