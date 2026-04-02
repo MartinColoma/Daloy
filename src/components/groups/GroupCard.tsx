@@ -1,4 +1,4 @@
-import type { Group } from '@/types'
+import type { Group } from '../../types'
 
 interface GroupCardProps {
   group: Group

@@ -1,5 +1,5 @@
 import apiClient from '../apiClient'
-import type { Budget, BudgetUsage, Category, BudgetPeriod } from '@/types'
+import type { Budget, BudgetUsage, Category, BudgetPeriod } from '../../types'
 
 // ─── Local payload type ───────────────────────────────────────────────────────
 
