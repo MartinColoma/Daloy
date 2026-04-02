@@ -1,4 +1,4 @@
-import type { Group } from '@/types'
+import type { Group } from '../../types'
 import { useGroupStore } from '../../stores/groupStore'
 import { GroupCard } from '../groups/GroupCard'
 

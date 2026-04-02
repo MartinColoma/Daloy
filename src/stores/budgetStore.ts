@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { BudgetUsage, Category } from '@/types'
+import type { BudgetUsage, Category } from '../types'
 
 // ─── Budget Store ─────────────────────────────────────────────────────────────
 // Manages budget envelopes for the active period, category list, and the
