@@ -3,12 +3,12 @@
 // API calls for Quick Actions modals — fully typed.
 // ============================================================
 
-import apiClient from "./apiClient";
+import apiClient from "../apiClient";
 import type {
   AddExpenseOptionsResponse,
   CreateExpenseRequest,
   CreateExpenseResponse,
-} from "../types/quickActions.types";
+} from "../../types/home/quickActions.types";
 
 // ── GET /quick-actions/add-expense/options ───────────────────
 export async function fetchAddExpenseOptions(): Promise<AddExpenseOptionsResponse> {

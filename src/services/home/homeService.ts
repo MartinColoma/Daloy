@@ -3,13 +3,13 @@
 // API calls for the /home dashboard — fully typed.
 // ============================================================
 
-import apiClient from "./apiClient";
+import apiClient from "../apiClient";
 import type {
   HomeSummaryResponse,
   RecentTransactionsResponse,
   BudgetSnapshotResponse,
   HomeWalletsResponse,
-} from "../types/home.types";
+} from "../../types/home/home.types";
 
 // ── GET /home/wallets ────────────────────────────────────────
 export async function fetchHomeWallets(): Promise<HomeWalletsResponse> {

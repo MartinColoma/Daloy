@@ -1,4 +1,4 @@
-import apiClient from './apiClient'
+import apiClient from '../apiClient'
 import type { Group, GroupMember, GroupExpense, DebtRecord } from '@/types'
 
 // ─── Local types (not in index.ts) ───────────────────────────────────────────

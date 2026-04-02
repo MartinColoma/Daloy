@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
-import { patchBaseCurrency } from "../../services/onboardingService";
+import { patchBaseCurrency } from "../../services/onboarding/onboardingService";
 
 /* ─────────────────────────────────────────────
    StepCurrency.tsx — Onboarding Step 1

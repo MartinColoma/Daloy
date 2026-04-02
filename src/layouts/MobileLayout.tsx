@@ -6,14 +6,6 @@ import QuickActionsSheet from "../components/layout/QuickActionsSheet";
 import { useLayout }    from "./LayoutContext";
 import ModalManager from "../components/modals/ModalManager";
 
-/* ─────────────────────────────────────────────
-   MobileLayout.tsx
-   Full-height shell: scrollable content + BottomNav.
-   FAB floats center above BottomNav.
-   Quick Actions sheet slides up on FAB tap.
-   Rendered by RootLayout when window < 1024px.
-───────────────────────────────────────────── */
-
 export default function MobileLayout() {
   const { quickActionsOpen, closeQuickActions } = useLayout();
 
@@ -22,17 +14,17 @@ export default function MobileLayout() {
       className="flex flex-col h-dvh overflow-hidden"
       style={{ background: "var(--bg)" }}
     >
-      {/* Scrollable page content */}
-      <main className="flex-1 overflow-y-auto">
+      {/* Scrollable page content — px-4 gives all pages consistent side padding */}
+      <main className="flex-1 overflow-y-auto px-4 pt-5 pb-4">
         <Outlet />
       </main>
 
-      {/* Bottom nav + FAB — relative so FAB can use absolute positioning */}
+      {/* Bottom nav + FAB */}
       <div className="relative shrink-0">
         <FAB />
         <BottomNav />
       </div>
-      <ModalManager />  
+      <ModalManager />
       {/* Quick Actions bottom sheet */}
       <BottomSheet isOpen={quickActionsOpen} onClose={closeQuickActions}>
         <QuickActionsSheet />

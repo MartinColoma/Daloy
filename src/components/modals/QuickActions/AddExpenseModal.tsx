@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ShoppingCart } from "lucide-react";
-import ModalShell from "./ModalShell";
-import { fetchAddExpenseOptions, createExpense } from "../../services/quickActionsService";
+import ModalShell from "../ModalShell";
+import { useLayout } from "../../../layouts/LayoutContext";
+import { fetchAddExpenseOptions, createExpense } from "../../../services/home/quickActionsService";
 import type {
   ExpenseCategoryOption,
   WalletOption,
-} from "../../types/quickActions.types";
+} from "../../../types/home/quickActions.types";
 
 interface Props {
   isOpen:  boolean;
@@ -13,7 +14,10 @@ interface Props {
 }
 
 export default function AddExpenseModal({ isOpen, onClose }: Props) {
-  const [amount,      setAmount]      = useState("");
+  const { onModalSuccess } = useLayout();
+
+  // ── Cent-first amount state ──────────────────────────────
+  const [centStr,     setCentStr]     = useState("");   // raw integer string e.g. "1234" = ₱12.34
   const [description, setDescription] = useState("");
   const [walletId,    setWalletId]    = useState("");
   const [categoryId,  setCategoryId]  = useState("");
@@ -28,7 +32,25 @@ export default function AddExpenseModal({ isOpen, onClose }: Props) {
   const [submitting,  setSubmitting]  = useState(false);
   const [error,       setError]       = useState<string | null>(null);
 
-  // Load options when modal opens
+  // ── Derived amount values ────────────────────────────────
+  const numericAmount = centStr ? parseInt(centStr, 10) / 100 : 0;
+  const displayAmount = centStr
+    ? (parseInt(centStr, 10) / 100).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : "";
+
+  // ── Selected wallet + balance check ─────────────────────
+  const selectedWallet        = wallets.find(w => w.id === walletId);
+  const walletBalance         = selectedWallet?.balance ?? 0;
+  const isInsufficientBalance =
+    !!centStr &&
+    numericAmount > 0 &&
+    currency === selectedWallet?.currency &&
+    numericAmount > walletBalance;
+
+  // ── Load options when modal opens ───────────────────────
   useEffect(() => {
     if (!isOpen) return;
     setLoading(true);
@@ -44,9 +66,23 @@ export default function AddExpenseModal({ isOpen, onClose }: Props) {
       .finally(() => setLoading(false));
   }, [isOpen]);
 
+  // ── Cent-first key handler ───────────────────────────────
+  const handleAmountKey = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") {
+      setCentStr(prev => prev.slice(0, -1));
+    } else if (/^\d$/.test(e.key)) {
+      setCentStr(prev => {
+        const next = (prev + e.key).replace(/^0+/, "") || "";
+        // Cap at 999,999,999.99 to prevent overflow
+        if (parseInt(next, 10) > 99_999_999_999) return prev;
+        return next;
+      });
+    }
+    e.preventDefault();
+  }, []);
+
   const handleClose = () => {
-    // Reset form
-    setAmount("");
+    setCentStr("");
     setDescription("");
     setNote("");
     setIsRecurring(false);
@@ -56,11 +92,11 @@ export default function AddExpenseModal({ isOpen, onClose }: Props) {
   };
 
   const handleSubmit = async () => {
-    if (!amount || !description || !walletId || !categoryId) return;
+    if (!centStr || !description || !walletId || !categoryId || isInsufficientBalance) return;
     setSubmitting(true);
     setError(null);
     try {
-      const parsedAmount = parseFloat(amount);
+      const parsedAmount = numericAmount;
       const exchangeRate = currency === "PHP" ? 1 : 57.8; // TODO: replace with live rate
       const baseAmount   = currency === "PHP" ? parsedAmount : parsedAmount * exchangeRate;
 
@@ -76,6 +112,10 @@ export default function AddExpenseModal({ isOpen, onClose }: Props) {
         note:             note || undefined,
         isRecurring,
       });
+
+      // ── Notify the active page to refetch its data ──────
+      onModalSuccess?.();
+
       handleClose();
     } catch {
       setError("Failed to save expense. Please try again.");
@@ -84,7 +124,7 @@ export default function AddExpenseModal({ isOpen, onClose }: Props) {
     }
   };
 
-  const isDisabled = !amount || !description || submitting || loading;
+  const isDisabled = !centStr || !description || submitting || loading || isInsufficientBalance;
 
   return (
     <ModalShell
@@ -130,16 +170,49 @@ export default function AddExpenseModal({ isOpen, onClose }: Props) {
             </select>
             <input
               className="daloy-input-mono"
-              type="number"
+              type="text"
+              inputMode="numeric"
               placeholder="0.00"
-              value={amount}
-              onChange={e => setAmount(e.target.value)}
-              style={{ color: "var(--expense)" }}
+              value={displayAmount}
+              onKeyDown={handleAmountKey}
+              onChange={() => {/* controlled via onKeyDown */}}
+              style={{
+                color: isInsufficientBalance ? "var(--clay)" : "var(--expense)",
+                transition: "color 0.15s",
+              }}
             />
           </div>
-          {currency !== "PHP" && amount && (
+
+          {/* FX hint */}
+          {currency !== "PHP" && centStr && (
             <p className="daloy-hint">
-              ≈ ₱{(parseFloat(amount) * 57.8).toLocaleString("en-PH", { maximumFractionDigits: 2 })} PHP at today's rate
+              ≈ ₱{(numericAmount * 57.8).toLocaleString("en-PH", { maximumFractionDigits: 2 })} PHP at today's rate
+            </p>
+          )}
+
+          {/* Insufficient balance warning */}
+          {isInsufficientBalance && (
+            <p style={{
+              padding: "10px 12px",
+              background: "var(--clay-bg)",
+              border: "1.5px solid var(--clay-m)",
+              borderRadius: "var(--radius-sm)",
+              color: "var(--clay)",
+              fontSize: "0.82rem",
+              fontFamily: "Outfit, sans-serif",
+              margin: "4px 0 0",
+              lineHeight: 1.5,
+            }}>
+              Insufficient balance.{" "}
+              <strong>{selectedWallet?.name}</strong> only has{" "}
+              <strong>
+                {selectedWallet?.currency}{" "}
+                {walletBalance.toLocaleString("en-PH", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </strong>.{" "}
+              Log income to this wallet first, or choose a different wallet.
             </p>
           )}
         </div>
@@ -185,7 +258,13 @@ export default function AddExpenseModal({ isOpen, onClose }: Props) {
               {loading
                 ? <option>Loading…</option>
                 : wallets.map(w => (
-                    <option key={w.id} value={w.id}>{w.name} ({w.currency})</option>
+                    <option key={w.id} value={w.id}>
+                      {w.name} · {w.currency}{" "}
+                      {w.balance.toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </option>
                   ))
               }
             </select>
@@ -265,8 +344,10 @@ export default function AddExpenseModal({ isOpen, onClose }: Props) {
             onClick={handleSubmit}
             disabled={isDisabled}
             style={{
+              flex: 1,
               background: isDisabled ? "var(--bg3)" : "var(--expense)",
               color:      isDisabled ? "var(--ink4)" : "white",
+              transition: "background 0.2s, color 0.2s",
             }}
           >
             {submitting ? "Saving…" : "Save Expense"}

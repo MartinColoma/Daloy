@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Users, Plus, X, UserCheck, ChevronRight, ChevronLeft } from "lucide-react";
-import ModalShell from "./ModalShell";
+import ModalShell from "../ModalShell";
 
 /* ─────────────────────────────────────────────
    GroupExpenseModal.tsx  (refactored)

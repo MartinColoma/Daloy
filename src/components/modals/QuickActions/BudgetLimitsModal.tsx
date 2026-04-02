@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SlidersHorizontal, Plus, Check, X } from "lucide-react";
-import ModalShell from "./ModalShell";
+import ModalShell from "../ModalShell";
 
 /* ─────────────────────────────────────────────
    BudgetLimitsModal.tsx

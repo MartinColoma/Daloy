@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Handshake, CheckCircle, ChevronLeft } from "lucide-react";
-import ModalShell from "./ModalShell";
+import ModalShell from "../ModalShell";
 
 /* ─────────────────────────────────────────────
    SettleUpModal.tsx  (refactored)

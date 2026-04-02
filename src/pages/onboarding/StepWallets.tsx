@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Trash2, ArrowRight, ChevronRight } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
-import { postWallets } from "../../services/onboardingService";
+import { postWallets } from "../../services/onboarding/onboardingService";
 
 /* ─────────────────────────────────────────────
    StepWallets.tsx — Onboarding Step 2

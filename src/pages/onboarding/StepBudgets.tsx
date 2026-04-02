@@ -7,7 +7,7 @@ import {
   postBudgets,
   postOnboardingComplete,
   type SystemCategory,
-} from "../../services/onboardingService";
+} from "../../services/onboarding/onboardingService";
 
 /* ─────────────────────────────────────────────
    StepBudgets.tsx — Onboarding Step 3 (Skippable)

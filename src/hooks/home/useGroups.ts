@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import groupService from '../services/groupService'
-import { useGroupStore } from '../stores/groupStore'
+import groupService from '../../services/wallet/groupService'
+import { useGroupStore } from '../../stores/groupStore'
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Briefcase } from "lucide-react";
-import ModalShell from "./ModalShell";
+import ModalShell from "../ModalShell";
 
 /* ─────────────────────────────────────────────
    LogIncomeModal.tsx

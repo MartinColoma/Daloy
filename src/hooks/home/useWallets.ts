@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import walletService from '../services/walletService'
-import { useWalletStore } from '../stores/walletStore'
+import walletService from '../../services/wallet/walletService'
+import { useWalletStore } from '../../stores/walletStore'
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 

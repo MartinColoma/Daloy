@@ -1,4 +1,4 @@
-import type { NetPosition } from '../../services/walletService'
+import type { NetPosition } from '../../services/wallet/walletService'
 
 interface NetPositionCardProps {
   netPosition: NetPosition | null

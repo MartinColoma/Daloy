@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { RefreshCcw, ArrowRight } from "lucide-react";
-import ModalShell from "./ModalShell";
+import ModalShell from "../ModalShell";
 
 /* ─────────────────────────────────────────────
    ConvertCurrencyModal.tsx

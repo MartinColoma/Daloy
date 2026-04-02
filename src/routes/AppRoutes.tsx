@@ -52,10 +52,6 @@ export default function AppRoutes() {
       <Route element={<ProtectedLayout />}>
         <Route element={<RootLayout />}>
           <Route path="/home" element={<HomePage />} />
-        </Route>
-      </Route>
-      <Route element={<ProtectedLayout />}>
-        <Route element={<RootLayout />}>
           <Route path="/wallet" element={<WalletPage />} />
         </Route>
       </Route>

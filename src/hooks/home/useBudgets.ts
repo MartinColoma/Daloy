@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import budgetService from '../services/budgetService'
-import { useBudgetStore } from '../stores/budgetStore'
+import budgetService from '../../services/wallet/budgetService'
+import { useBudgetStore } from '../../stores/budgetStore'
 import type { BudgetUsage } from '@/types'
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────

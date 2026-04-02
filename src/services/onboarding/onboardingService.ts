@@ -3,7 +3,7 @@
 // API calls for the 3-step onboarding flow — fully typed.
 // ============================================================
 
-import apiClient from "./apiClient";
+import apiClient from "../apiClient";
 import type {
   OnboardingStatusResponse,
   WalletResponse,
@@ -12,7 +12,7 @@ import type {
   CreateWalletEntry,
   CreateBudgetEntry,
   SystemCategory,
-} from "../types/onboarding.types";
+} from "../../types/onboarding/onboarding.types";
 
 export type { SystemCategory };
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { WalletWithBalance } from '@/types'
-import type { NetPosition } from '../services/walletService'
+import type { NetPosition } from '../services/wallet/walletService'
 
 // ─── Wallet Store ─────────────────────────────────────────────────────────────
 

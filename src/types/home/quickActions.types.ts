@@ -13,6 +13,7 @@ export interface WalletOption {
   id:       string;
   name:     string;
   currency: string;
+  balance:  number;
 }
 
 // ── GET /quick-actions/add-expense/options ───────────────────
