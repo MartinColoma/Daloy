@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Pencil, ArrowLeftRight, Archive, MoreHorizontal } from 'lucide-react'
-import type { WalletWithBalance } from '@/types'
+import type { WalletWithBalance } from '../../types'
 
 interface WalletTableProps {
   wallets:     WalletWithBalance[]

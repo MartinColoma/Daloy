@@ -1,6 +1,5 @@
 import apiClient from '../apiClient'
-import type { ApiResponse, Wallet, WalletWithBalance } from '@/types'
-
+import type { ApiResponse, Wallet, WalletWithBalance } from '../../types'
 // ─── Local payload types ──────────────────────────────────────────────────────
 
 export interface CreateWalletPayload {

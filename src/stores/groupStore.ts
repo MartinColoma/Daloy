@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Group, GroupMember, DebtRecord } from '@/types'
+import type { Group, GroupMember, DebtRecord } from '../types'
 import type { GroupBalance, NetGroupPosition } from '../services/wallet/groupService'
 
 // ─── Group Store ──────────────────────────────────────────────────────────────
