@@ -1,4 +1,4 @@
-import type { BudgetUsage } from '../../types'
+import type { BudgetUsage } from '../../../types'
 
 interface BudgetEnvelopesProps {
   envelopes: BudgetUsage[]

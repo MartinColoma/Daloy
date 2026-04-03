@@ -53,6 +53,8 @@ export default function AppRoutes() {
         <Route element={<RootLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/wallet" element={<WalletPage />} />
+          {/* <Route path="/history" element={<HistoryPage />} />
+          <Route path="/profile" element={<ProfilePage />} /> */}
         </Route>
       </Route>
       {/* ─── Fallback ───────────────────────────────────────────── */}

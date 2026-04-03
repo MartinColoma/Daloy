@@ -506,8 +506,8 @@ function MobileWalletChips({ wallets, loading }: { wallets: HomeWalletItem[]; lo
           Manage <ArrowRight size={11} />
         </Link>
       </div>
-      <div className="flex gap-2.5 overflow-x-auto px-4 pb-1" style={{ scrollbarWidth: "none" }}>
-        {loading
+      <div className="flex gap-2.5 overflow-x-auto px-4 pb-1" style={{ scrollbarWidth: "none" }} data-no-swipe>
+          {loading
           ? [...Array(3)].map((_, i) => (
               <div key={i} className="flex-shrink-0 rounded-[var(--radius-md)] animate-pulse" style={{ background: "var(--bg3)", minWidth: "130px", minHeight: "80px" }} />
             ))
