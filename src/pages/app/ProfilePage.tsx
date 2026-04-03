@@ -14,11 +14,11 @@ function fmt(n: number): string {
   return `₱${Math.abs(n).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-function Skeleton({ style }: { style?: React.CSSProperties }) {
-  return (
-    <div className="animate-pulse rounded-[var(--radius-sm)]" style={{ background: "var(--bg3)", ...style }} />
-  );
-}
+// function Skeleton({ style }: { style?: React.CSSProperties }) {
+//   return (
+//     <div className="animate-pulse rounded-[var(--radius-sm)]" style={{ background: "var(--bg3)", ...style }} />
+//   );
+// }
 
 // ── Avatar ────────────────────────────────────────────────────
 function Avatar({ name, url, size = 56 }: { name: string; url?: string | null; size?: number }) {
@@ -300,7 +300,7 @@ export default function ProfilePage() {
     const { setPageTitle } = useLayout();
     const user                   = useAuthStore(s => s.user);
     const baseCurrency = user?.baseCurrency ?? "PHP";
-    const { signOut, isLoading }  = useAuth();
+    const { signOut }  = useAuth();
 
   const [currency,          setCurrency]          = useState(baseCurrency ?? "PHP");
   const [insightsExpanded,  setInsightsExpanded]  = useState(false);
