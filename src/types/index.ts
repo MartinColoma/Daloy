@@ -234,3 +234,69 @@ export interface TransactionFilters {
   page?: number;
   limit?: number;
 }
+// ── History ───────────────────────────────────────────────────────────────────
+// Query params for GET /history — all optional, combinable
+
+export interface HistoryQueryParams {
+  dateFrom?: string;      // YYYY-MM-DD, inclusive lower bound
+  dateTo?: string;        // YYYY-MM-DD, inclusive upper bound
+  type?: TransactionType;
+  walletId?: string;
+  categoryId?: string;
+  search?: string;        // matches description, category name, wallet name
+  page?: number;          // 1-based, default 1
+  limit?: number;         // default 50, max 500
+}
+
+// Flattened transaction row returned by GET /history.
+// Derived from TransactionWithRelations but flattened so the FE
+// doesn't need to traverse nested objects.
+
+export interface HistoryTransactionItem {
+  id: string;
+  type: TransactionType;
+
+  // core transaction fields
+  amount: number;               // always in base currency (PHP)
+  originalAmount: number | null;
+  originalCurrency: string | null;
+  exchangeRate: number | null;
+  transactedAt: string;         // ISO 8601
+  description: string | null;
+  groupExpenseId: string | null;
+
+  // category (flattened from Category)
+  categoryId: string | null;
+  categoryName: string | null;
+  categoryIcon: string | null;
+
+  // source wallet (flattened from Wallet)
+  walletId: string;
+  walletName: string;
+
+  // destination wallet — transfers only (flattened from Wallet)
+  toWalletId: string | null;
+  toWalletName: string | null;
+}
+
+// Period aggregate returned alongside the transaction list
+
+export interface HistoryPeriodSummary {
+  totalIncome: number;
+  totalExpenses: number;
+  net: number;              // totalIncome - totalExpenses
+  transactionCount: number;
+}
+
+// Full response envelope from GET /history
+
+export interface HistoryListResponse {
+  transactions: HistoryTransactionItem[];
+  summary: HistoryPeriodSummary;
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}

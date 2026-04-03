@@ -21,8 +21,8 @@ import StepBudgets      from "../pages/onboarding/StepBudgets";
 // App pages
 import HomePage     from "../pages/app/HomePage";
 import WalletPage   from "../pages/app/WalletPage";
-// import HistoryPage  from "../pages/app/HistoryPage";
-// import ProfilePage  from "../pages/app/ProfilePage";
+import HistoryPage  from "../pages/app/HistoryPage";
+import ProfilePage  from "../pages/app/ProfilePage";
 
 export default function AppRoutes() {
   return (
@@ -53,8 +53,8 @@ export default function AppRoutes() {
         <Route element={<RootLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/wallet" element={<WalletPage />} />
-          {/* <Route path="/history" element={<HistoryPage />} />
-          <Route path="/profile" element={<ProfilePage />} /> */}
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>
       {/* ─── Fallback ───────────────────────────────────────────── */}
