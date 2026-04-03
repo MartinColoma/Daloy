@@ -204,17 +204,17 @@ export function SpendingChart({ bars, loading, onBarClick }: SpendingChartProps)
         );
       })}
 
-      {/* Tooltip rendered once, positioned absolutely */}
-      {hovered !== null && (
-        <BarTooltip
-          data={{
-            x: tooltipX,
-            label: bars[hovered].label || `Bar ${hovered + 1}`,
-            income: bars[hovered].income,
-            expense: bars[hovered].expense,
-          }}
-        />
-      )}
+    {/* Tooltip rendered once, positioned absolutely */}
+    {hovered !== null && hovered < bars.length && bars[hovered] && (
+    <BarTooltip
+        data={{
+        x: tooltipX,
+        label: bars[hovered].label || `Bar ${hovered + 1}`,
+        income: bars[hovered].income,
+        expense: bars[hovered].expense,
+        }}
+    />
+    )}
     </div>
   );
 }
