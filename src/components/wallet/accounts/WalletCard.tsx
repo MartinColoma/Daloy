@@ -1,4 +1,4 @@
-import type { WalletWithBalance } from '../../types'
+import type { WalletWithBalance } from '../../../types'
 
 interface WalletCardProps {
   wallet: WalletWithBalance

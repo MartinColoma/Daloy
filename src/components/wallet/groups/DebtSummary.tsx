@@ -1,4 +1,4 @@
-import { useGroupBalance, useSimplifiedDebts, useGroupExpenses } from '../../hooks/home/useGroups'
+import { useGroupBalance, useSimplifiedDebts, useGroupExpenses } from '../../../hooks/home/useGroups'
 import { GroupExpenseList } from './GroupExpenseList'
 
 interface DebtSummaryProps {

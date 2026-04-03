@@ -1,5 +1,5 @@
-import type { Group } from '../../types'
-import { useGroupStore } from '../../stores/groupStore'
+import type { Group } from '../../../types'
+import { useGroupStore } from '../../../stores/groupStore'
 import { GroupCard } from '../groups/GroupCard'
 
 interface GroupsOverviewProps {

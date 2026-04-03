@@ -1,4 +1,4 @@
-import type { GroupExpense } from '../../types'
+import type { GroupExpense } from '../../../types'
 import { format } from 'date-fns'
 
 interface GroupExpenseListProps {

@@ -14,13 +14,13 @@ import { useBudgets }                 from '../../hooks/home/useBudgets'
 import { useGroups, useGroupBalance, useNetGroupPosition } from '../../hooks/home/useGroups'
 
 // ── Components — wallet/ ──────────────────────────────────────────────────────
-import { WalletTable }      from '../../components/wallet/WalletTable'
-import { NetPositionCard }  from '../../components/wallet/NetPositionCard'
-import { BudgetEnvelopes }  from '../../components/wallet/BudgetEnvelopes'
-import { GroupsOverview }   from '../../components/wallet/GroupsOverview'
+import { WalletTable }      from '../../components/wallet/accounts/WalletTable'
+import { NetPositionCard }  from '../../components/wallet/accounts/NetPositionCard'
+import { BudgetEnvelopes }  from '../../components/wallet/accounts/BudgetEnvelopes'
+import { GroupsOverview }   from '../../components/wallet/accounts/GroupsOverview'
 
 // ── Components — groups/ ──────────────────────────────────────────────────────
-import { DebtSummary } from '../../components/groups/DebtSummary'
+import { DebtSummary } from '../../components/wallet/groups/DebtSummary'
 
 // ── Modals ────────────────────────────────────────────────────────────────────
 import AddWalletModal      from '../../components/modals/QuickActions/AddWalletModal'
