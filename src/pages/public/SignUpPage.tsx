@@ -8,6 +8,8 @@ import { useAuth } from "../../hooks/useAuth";
    Public auth page — email/password + Google OAuth.
    On success → /onboarding/currency (new users always
    go through onboarding before /home).
+   If email confirmation is required → Swal info →
+   redirect to /sign-in.
 ───────────────────────────────────────────── */
 
 function GoogleIcon() {
