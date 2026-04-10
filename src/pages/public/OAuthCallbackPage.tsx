@@ -1,16 +1,18 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../../services/authService";
+import { authService } from "../../services/auth/authService";
 import { useAuthStore } from "../../stores/authStore";
+
 /**
  * OAuthCallbackPage
  *
  * Mounted at /oauth/callback.
- * Google redirects here with ?code=... after the user approves.
+ * Google redirects here with tokens in the URL hash after the user approves.
+ * (Supabase implicit flow: #access_token=...&refresh_token=...)
  *
  * Flow:
- *   1. Extract ?code from URL
- *   2. POST to /api/auth/oauth/callback (BE exchanges code for Supabase session)
+ *   1. Extract tokens from URL hash
+ *   2. POST to /api/auth/oauth/callback (BE validates token, builds AuthUser)
  *   3. Save user + tokens to authStore
  *   4. Redirect → /onboarding/currency (new user) or /home (returning user)
  */
@@ -30,17 +32,20 @@ const OAuthCallbackPage = () => {
       const refreshToken = hash.get("refresh_token");
 
       if (!accessToken) {
-        console.error("No access_token in URL hash");
+        console.error("[OAuthCallbackPage] No access_token in URL hash");
         navigate("/sign-in?error=oauth_failed");
         return;
       }
 
       try {
-        const { user, tokens } = await authService.exchangeOAuthCode(accessToken, refreshToken ?? "");
+        const { user, tokens } = await authService.exchangeOAuthCode(
+          accessToken,
+          refreshToken ?? ""
+        );
         setAuth(user, tokens);
         navigate(user.onboardingDone ? "/home" : "/onboarding/currency");
       } catch (err) {
-        console.error("OAuth callback error:", err);
+        console.error("[OAuthCallbackPage] OAuth callback error:", err);
         navigate("/sign-in?error=oauth_failed");
       }
     };

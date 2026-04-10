@@ -46,6 +46,7 @@ apiClient.interceptors.response.use(
       useAuthStore.getState().clearAuth();
       window.location.href = "/sign-in";
     }
+    // 403 = forbidden (e.g. email not confirmed) — let it through to the caller
     return Promise.reject(error);
   }
 );

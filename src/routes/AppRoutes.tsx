@@ -6,6 +6,7 @@ import ProtectedLayout from "../layouts/ProtectedLayout";
 import RootLayout      from "../layouts";
 
 import OAuthCallbackPage from "../pages/public/OAuthCallbackPage";
+import ConfirmEmailPage from "../pages/public/ConfirmEmailPage";
 
 // Public pages
 import LandingPage from "../pages/public/LandingPage";
@@ -33,6 +34,7 @@ export default function AppRoutes() {
         <Route path="/"        element={<LandingPage />} />
         <Route path="/sign-in" element={<SignInPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
+        <Route path="/confirm-email" element={<ConfirmEmailPage />} />
       </Route>
 
       {/* ─── OAuth callback — outside PublicLayout (no auth guard) ── */}

@@ -1,11 +1,25 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import {  Wallet,  PieChart,  Users,  Globe,  TrendingUp,  ShieldCheck,  ArrowRight,  type LucideIcon,} from "lucide-react";
+import {
+  Wallet,
+  PieChart,
+  Users,
+  Globe,
+  TrendingUp,
+  ShieldCheck,
+  ArrowRight,
+  Menu,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+import AppShowcase from "./AppShowcase";
 
 /* ─────────────────────────────────────────────
    LandingPage.tsx
    Public marketing page for Daloy.
    Styled with Tailwind CSS v4 + CSS variables from index.css.
    Fonts: Lora | Outfit | IBM Plex Mono (Google Fonts in index.html)
+   Mobile-responsive: hamburger nav, stacked hero, bottom CTA strip.
 ───────────────────────────────────────────── */
 
 // ── Feature data ──────────────────────────────────────────────────
@@ -50,6 +64,8 @@ const features: Feature[] = [
 
 // ── Component ─────────────────────────────────────────────────────
 export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div
       className="min-h-screen overflow-x-hidden font-outfit"
@@ -58,21 +74,30 @@ export default function LandingPage() {
 
       {/* ── Nav ── */}
       <nav
-        className="sticky top-0 z-50 flex items-center justify-between px-8 py-5 border-b"
+        className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-8 py-4 md:py-5 border-b"
         style={{
           background: "var(--bg)",
           borderColor: "var(--bg3)",
         }}
       >
+        {/* Logo */}
         <Link
           to="/"
           className="font-lora font-bold text-[1.35rem] tracking-tight no-underline"
           style={{ color: "var(--ink)" }}
         >
-          Dalo<span style={{ color: "var(--forest)" }}>y</span>
+          dal<span style={{ color: "var(--forest)" }}>oy</span>
         </Link>
 
-        <div className="flex items-center gap-8">
+        {/* Desktop nav links */}
+        <div className="hidden md:flex items-center gap-8">
+          <a
+            href="#showcase"
+            className="font-outfit font-normal text-[0.88rem] no-underline transition-colors hover:opacity-80"
+            style={{ color: "var(--ink2)" }}
+          >
+            Preview
+          </a>
           <a
             href="#features"
             className="font-outfit font-normal text-[0.88rem] no-underline transition-colors hover:opacity-80"
@@ -97,21 +122,77 @@ export default function LandingPage() {
             Get started
           </Link>
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="md:hidden flex items-center justify-center w-9 h-9 rounded-[var(--radius-sm)]"
+          style={{ color: "var(--ink2)" }}
+          onClick={() => setMobileMenuOpen(v => !v)}
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </nav>
 
+      {/* ── Mobile menu drawer ── */}
+      {mobileMenuOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 flex flex-col pt-[64px]"
+          style={{ background: "var(--bg)" }}
+        >
+          <div
+            className="flex flex-col px-6 py-8 gap-6 border-b"
+            style={{ borderColor: "var(--bg3)" }}
+          >
+            <a
+              href="#showcase"
+              className="font-outfit font-medium text-[1rem] no-underline"
+              style={{ color: "var(--ink2)" }}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Preview
+            </a>
+            <a
+              href="#features"
+              className="font-outfit font-medium text-[1rem] no-underline"
+              style={{ color: "var(--ink2)" }}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Features
+            </a>
+            <Link
+              to="/sign-in"
+              className="font-outfit font-medium text-[1rem] no-underline"
+              style={{ color: "var(--ink2)" }}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Sign in
+            </Link>
+            <Link
+              to="/sign-up"
+              className="inline-flex items-center justify-center gap-2 font-outfit font-medium text-[0.95rem] text-white no-underline px-6 py-3 rounded-[var(--radius-sm)]"
+              style={{ background: "var(--forest)" }}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Get started <ArrowRight size={15} />
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* ── Hero ── */}
-      <section className="max-w-[860px] mx-auto px-8 pt-24 pb-20 text-center">
+      <section className="max-w-[860px] mx-auto px-6 md:px-8 pt-14 md:pt-24 pb-14 md:pb-20 text-center">
         <span
-          className="font-mono font-normal text-[0.65rem] tracking-[0.18em] uppercase block mb-5"
+          className="font-mono font-normal text-[0.65rem] tracking-[0.18em] uppercase block mb-4 md:mb-5"
           style={{ color: "var(--forest-l)" }}
         >
           Personal Finance — Simplified
         </span>
 
         <h1
-          className="font-lora font-bold leading-[1.15] tracking-tight mb-5"
+          className="font-lora font-bold leading-[1.15] tracking-tight mb-4 md:mb-5"
           style={{
-            fontSize: "clamp(2.4rem, 6vw, 3.6rem)",
+            fontSize: "clamp(2rem, 8vw, 3.6rem)",
             color: "var(--ink)",
           }}
         >
@@ -121,7 +202,7 @@ export default function LandingPage() {
         </h1>
 
         <p
-          className="font-outfit font-light text-[1.1rem] leading-[1.7] max-w-[540px] mx-auto mb-10"
+          className="font-outfit font-light text-[0.95rem] md:text-[1.1rem] leading-[1.7] max-w-[540px] mx-auto mb-8 md:mb-10"
           style={{ color: "var(--ink3)" }}
         >
           Daloy combines budget tracking, group expense splitting, and
@@ -129,7 +210,8 @@ export default function LandingPage() {
           for how Filipinos actually manage money.
         </p>
 
-        <div className="flex items-center justify-center gap-3 flex-wrap">
+        {/* Desktop CTA buttons */}
+        <div className="hidden md:flex items-center justify-center gap-3 flex-wrap">
           <Link
             to="/sign-up"
             className="inline-flex items-center gap-2 font-outfit font-medium text-[0.9rem] text-white no-underline px-8 py-3 rounded-[var(--radius-sm)] transition-colors"
@@ -139,8 +221,8 @@ export default function LandingPage() {
           >
             Start for free <ArrowRight size={15} />
           </Link>
-          <Link
-            to="/sign-in"
+          <a
+            href="#showcase"
             className="inline-block font-outfit font-normal text-[0.9rem] no-underline px-8 py-3 rounded-[var(--radius-sm)] border-[1.5px] transition-colors"
             style={{
               color: "var(--forest)",
@@ -149,29 +231,58 @@ export default function LandingPage() {
             onMouseEnter={e => (e.currentTarget.style.background = "var(--forest-bg)")}
             onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
           >
-            I have an account
+            See it in action
+          </a>
+        </div>
+
+        {/* Mobile hero CTA — single primary button */}
+        <div className="md:hidden flex flex-col gap-3">
+          <Link
+            to="/sign-up"
+            className="inline-flex items-center justify-center gap-2 font-outfit font-medium text-[0.95rem] text-white no-underline px-6 py-3.5 rounded-[var(--radius-sm)]"
+            style={{ background: "var(--forest)" }}
+          >
+            Start for free <ArrowRight size={15} />
           </Link>
+          <a
+            href="#showcase"
+            className="inline-flex items-center justify-center font-outfit font-normal text-[0.88rem] no-underline px-6 py-3 rounded-[var(--radius-sm)] border-[1.5px]"
+            style={{
+              color: "var(--forest)",
+              borderColor: "var(--forest-xl)",
+            }}
+          >
+            See it in action
+          </a>
         </div>
       </section>
 
       {/* ── Tagline strip ── */}
       <div
-        className="border-t border-b px-8 py-4 text-center"
+        className="border-t border-b px-6 md:px-8 py-4 text-center"
         style={{
           background: "var(--bg2)",
           borderColor: "var(--bg3)",
         }}
       >
         <p
-          className="font-lora italic font-normal text-[1.05rem] tracking-[0.01em]"
+          className="font-lora italic font-normal text-[0.95rem] md:text-[1.05rem] tracking-[0.01em]"
           style={{ color: "var(--ink3)" }}
         >
           "Track it. Split it. Understand it."
         </p>
       </div>
 
+      {/* ── App Showcase ── */}
+      {/*
+        Anchored here — between the tagline strip and the features grid.
+        The section carries id="showcase" so the nav "Preview" link
+        and the hero "See it in action" button both scroll to it.
+      */}
+      <AppShowcase />
+
       {/* ── Features ── */}
-      <section id="features" className="max-w-[1040px] mx-auto px-8 py-20">
+      <section id="features" className="max-w-[1040px] mx-auto px-6 md:px-8 py-14 md:py-20">
         <span
           className="font-mono font-normal text-[0.65rem] tracking-[0.18em] uppercase block mb-3"
           style={{ color: "var(--ink4)" }}
@@ -179,30 +290,34 @@ export default function LandingPage() {
           What Daloy does
         </span>
         <h2
-          className="font-lora font-semibold text-[1.8rem] tracking-tight mb-12"
+          className="font-lora font-semibold text-[1.5rem] md:text-[1.8rem] tracking-tight mb-8 md:mb-12"
           style={{ color: "var(--ink)" }}
         >
           Everything in one flow.
         </h2>
 
-        <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+        {/* 1 col on mobile, auto-fit 280px+ on tablet/desktop */}
+        <div
+          className="grid gap-4 md:gap-6"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))" }}
+        >
           {features.map(({ Icon, title, desc }) => (
             <div
               key={title}
-              className="border rounded-[var(--radius-xl)] p-8"
+              className="border rounded-[var(--radius-xl)] p-6 md:p-8"
               style={{
                 background: "var(--bg2)",
                 borderColor: "var(--bg3)",
               }}
             >
               <div
-                className="w-[42px] h-[42px] rounded-[var(--radius-md)] flex items-center justify-center mb-5"
+                className="w-[40px] h-[40px] md:w-[42px] md:h-[42px] rounded-[var(--radius-md)] flex items-center justify-center mb-4 md:mb-5"
                 style={{
                   background: "var(--forest-bg)",
                   color: "var(--forest)",
                 }}
               >
-                <Icon size={20} strokeWidth={1.75} />
+                <Icon size={19} strokeWidth={1.75} />
               </div>
               <p
                 className="font-outfit font-semibold text-[0.95rem] mb-2"
@@ -223,15 +338,15 @@ export default function LandingPage() {
 
       {/* ── Stats ── */}
       <section
-        className="border-t border-b px-8 py-16"
+        className="border-t border-b px-6 md:px-8 py-12 md:py-16"
         style={{
           background: "var(--bg2)",
           borderColor: "var(--bg3)",
         }}
       >
+        {/* 2-col grid on mobile, auto-fit on larger */}
         <div
-          className="max-w-[800px] mx-auto grid gap-10 text-center"
-          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}
+          className="max-w-[800px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 text-center"
         >
           {[
             { number: "₱0",   label: "Cost, forever free tier" },
@@ -241,13 +356,13 @@ export default function LandingPage() {
           ].map(({ number, label }) => (
             <div key={label}>
               <span
-                className="font-mono font-medium text-[2rem] block mb-1.5"
+                className="font-mono font-medium text-[1.75rem] md:text-[2rem] block mb-1.5"
                 style={{ color: "var(--forest)" }}
               >
                 {number}
               </span>
               <span
-                className="font-outfit font-normal text-[0.83rem]"
+                className="font-outfit font-normal text-[0.78rem] md:text-[0.83rem]"
                 style={{ color: "var(--ink3)" }}
               >
                 {label}
@@ -258,7 +373,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="max-w-[600px] mx-auto px-8 py-24 text-center">
+      {/* Hidden on mobile — replaced by the sticky bottom bar below */}
+      <section className="hidden md:block max-w-[600px] mx-auto px-8 py-24 text-center">
         <h2
           className="font-lora font-bold text-[2rem] tracking-tight mb-4"
           style={{ color: "var(--ink)" }}
@@ -283,39 +399,100 @@ export default function LandingPage() {
         </Link>
       </section>
 
-      {/* ── Footer ── */}
-      <footer
-        className="border-t px-8 py-8 flex items-center justify-between flex-wrap gap-4"
-        style={{ borderColor: "var(--bg3)" }}
+      {/* Mobile-only CTA section (above footer, not sticky) */}
+      <section
+        className="md:hidden px-6 py-12 text-center"
       >
-        <Link
-          to="/"
-          className="font-lora font-bold text-[1rem] no-underline"
+        <h2
+          className="font-lora font-bold text-[1.6rem] tracking-tight mb-3"
           style={{ color: "var(--ink)" }}
         >
-          daloy
-        </Link>
-        <span
-          className="font-outfit font-normal text-[0.78rem]"
-          style={{ color: "var(--ink4)" }}
+          Ready to see where it goes?
+        </h2>
+        <p
+          className="font-outfit font-light text-[0.9rem] leading-[1.6] mb-6"
+          style={{ color: "var(--ink3)" }}
         >
-          © {new Date().getFullYear()} Daloy. Built with intention.
-        </span>
-        <div className="flex gap-6">
-          <a
-            href="#"
-            className="font-outfit font-normal text-[0.78rem] no-underline hover:opacity-70 transition-opacity"
+          Create your account in under a minute. No credit card required.
+        </p>
+        <Link
+          to="/sign-up"
+          className="inline-flex items-center justify-center gap-2 font-outfit font-medium text-[0.95rem] text-white no-underline w-full max-w-[340px] py-3.5 rounded-[var(--radius-sm)]"
+          style={{ background: "var(--forest)" }}
+        >
+          Create free account <ArrowRight size={15} />
+        </Link>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer
+        className="border-t px-6 md:px-8 py-6 md:py-8"
+        style={{ borderColor: "var(--bg3)" }}
+      >
+        {/* Desktop: single row */}
+        <div className="hidden md:flex items-center justify-between flex-wrap gap-4">
+          <Link
+            to="/"
+            className="font-lora font-bold text-[1rem] no-underline"
+            style={{ color: "var(--ink)" }}
+          >
+            daloy
+          </Link>
+          <span
+            className="font-outfit font-normal text-[0.78rem]"
             style={{ color: "var(--ink4)" }}
           >
-            Privacy
-          </a>
-          <a
-            href="#"
-            className="font-outfit font-normal text-[0.78rem] no-underline hover:opacity-70 transition-opacity"
+            © {new Date().getFullYear()} Daloy. Built with intention.
+          </span>
+          <div className="flex gap-6">
+            <a
+              href="#"
+              className="font-outfit font-normal text-[0.78rem] no-underline hover:opacity-70 transition-opacity"
+              style={{ color: "var(--ink4)" }}
+            >
+              Privacy
+            </a>
+            <a
+              href="#"
+              className="font-outfit font-normal text-[0.78rem] no-underline hover:opacity-70 transition-opacity"
+              style={{ color: "var(--ink4)" }}
+            >
+              Terms
+            </a>
+          </div>
+        </div>
+
+        {/* Mobile: stacked */}
+        <div className="md:hidden flex flex-col items-center gap-4 text-center">
+          <Link
+            to="/"
+            className="font-lora font-bold text-[1.1rem] no-underline"
+            style={{ color: "var(--ink)" }}
+          >
+            daloy
+          </Link>
+          <div className="flex gap-6">
+            <a
+              href="#"
+              className="font-outfit font-normal text-[0.78rem] no-underline"
+              style={{ color: "var(--ink4)" }}
+            >
+              Privacy
+            </a>
+            <a
+              href="#"
+              className="font-outfit font-normal text-[0.78rem] no-underline"
+              style={{ color: "var(--ink4)" }}
+            >
+              Terms
+            </a>
+          </div>
+          <span
+            className="font-outfit font-normal text-[0.72rem]"
             style={{ color: "var(--ink4)" }}
           >
-            Terms
-          </a>
+            © {new Date().getFullYear()} Daloy. Built with intention.
+          </span>
         </div>
       </footer>
 
