@@ -1,6 +1,6 @@
 import type { Group } from '../../../types'
 import { useGroupStore } from '../../../stores/groupStore'
-import { GroupCard } from '../groups/GroupCard'
+import { GroupCard } from './GroupCard'
 
 interface GroupsOverviewProps {
   groups: Group[]

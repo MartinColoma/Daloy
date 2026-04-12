@@ -8,6 +8,7 @@ import {
   getWeekLabel,
   getMonthLabel,
 } from "../../lib/historyUtils";
+import { useCurrency } from "../../hooks/useCurrency";
 
 // ── View tab switcher ──────────────────────────────────────────────────────
 interface ViewTabsProps {
@@ -152,11 +153,7 @@ export function SummaryBar({ income, expense, loading }: SummaryBarProps) {
     );
   }
 
-  const fmt = (n: number) =>
-    `₱${Math.abs(n).toLocaleString("en-PH", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
+  const { format } = useCurrency(); // ← add
 
   return (
     <div className="flex gap-4 px-1">
@@ -182,7 +179,7 @@ export function SummaryBar({ income, expense, loading }: SummaryBarProps) {
             style={{ color }}
           >
             {prefix ?? ""}
-            {fmt(value)}
+            {format(value)}
           </p>
         </div>
       ))}

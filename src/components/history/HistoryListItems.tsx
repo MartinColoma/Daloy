@@ -1,6 +1,7 @@
 import { Search, X, TrendingUp, TrendingDown, ArrowLeftRight, Users, Handshake } from "lucide-react";
 import type { HistoryTransactionItem } from "../../services/history/historyService";
-import { fmt, type TypeFilter, TYPE_FILTERS } from "../../lib/historyUtils";
+import { type TypeFilter, TYPE_FILTERS } from "../../lib/historyUtils";
+import { useCurrency } from "../../hooks/useCurrency";
 
 // ── Transaction type icon ──────────────────────────────────────────────────
 export function TxnTypeIcon({ type }: { type: HistoryTransactionItem["type"] }) {
@@ -36,7 +37,7 @@ export function TxnRow({ t, last }: TxnRowProps) {
       })}`
     );
   }
-
+  const { format } = useCurrency(); 
   return (
     <div
       className="flex items-center gap-3 px-4 py-3"
@@ -71,7 +72,7 @@ export function TxnRow({ t, last }: TxnRowProps) {
           style={{ color: amountColor }}
         >
           {prefix}
-          {fmt(t.amount)}
+          {format(t.amount)}
         </p>
         <div
           className="flex items-center justify-end gap-1 mt-0.5"

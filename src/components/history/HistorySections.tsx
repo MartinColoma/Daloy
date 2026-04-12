@@ -1,9 +1,10 @@
 import { ViewTabs, PeriodNavigator, SummaryBar } from "./HistoryControls";
 import { SpendingChart } from "./SpendingChart";
 import { TxnRow, Skeleton, EmptyHistory, SearchBar, TypePills } from "./HistoryListItems";
-import { fmt, formatDayEyebrow, getDayTotals, groupByDay } from "../../lib/historyUtils";
+import { formatDayEyebrow, getDayTotals, groupByDay } from "../../lib/historyUtils";
 import type { ViewMode, TypeFilter, BarDatum } from "../../lib/historyUtils";
 import type { HistoryTransactionItem, HistoryPeriodSummary } from "../../services/history/historyService";
+import { useCurrency } from "../../hooks/useCurrency";
 
 // ── Chart + summary card ───────────────────────────────────────────────────
 interface ChartBlockProps {
@@ -53,6 +54,7 @@ interface DayGroupProps {
 
 export function DayGroup({ dateKey, txns, mobile }: DayGroupProps) {
   const t = getDayTotals(txns);
+  const { format } = useCurrency(); 
   return (
     <div>
       <div
@@ -70,7 +72,7 @@ export function DayGroup({ dateKey, txns, mobile }: DayGroupProps) {
               className={`font-mono ${mobile ? "text-[0.62rem]" : "text-[0.65rem]"}`}
               style={{ color: "var(--income)" }}
             >
-              +{fmt(t.income)}
+              +{format(t.income)}
             </span>
           )}
           {t.expense > 0 && (
@@ -78,7 +80,7 @@ export function DayGroup({ dateKey, txns, mobile }: DayGroupProps) {
               className={`font-mono ${mobile ? "text-[0.62rem]" : "text-[0.65rem]"}`}
               style={{ color: "var(--expense)" }}
             >
-              −{fmt(t.expense)}
+              −{format(t.expense)}
             </span>
           )}
         </div>

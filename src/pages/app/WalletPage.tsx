@@ -12,12 +12,13 @@ import { useGroupStore }  from '../../stores/groupStore'
 import { useWallets, useNetPosition } from '../../hooks/home/useWallets'
 import { useBudgets }                 from '../../hooks/home/useBudgets'
 import { useGroups, useGroupBalance, useNetGroupPosition } from '../../hooks/home/useGroups'
+import { useCurrency } from "../../hooks/useCurrency";
 
 // ── Components — wallet/ ──────────────────────────────────────────────────────
 import { WalletTable }      from '../../components/wallet/accounts/WalletTable'
 import { NetPositionCard }  from '../../components/wallet/accounts/NetPositionCard'
-import { BudgetEnvelopes }  from '../../components/wallet/accounts/BudgetEnvelopes'
-import { GroupsOverview }   from '../../components/wallet/accounts/GroupsOverview'
+import { BudgetEnvelopes }  from '../../components/wallet/budgets/BudgetEnvelopes'
+import { GroupsOverview }   from '../../components/wallet/groups/GroupsOverview'
 
 // ── Components — groups/ ──────────────────────────────────────────────────────
 import { DebtSummary } from '../../components/wallet/groups/DebtSummary'
@@ -86,13 +87,6 @@ function Skeleton({ style }: { style?: React.CSSProperties }) {
   )
 }
 
-// ─── Inline Transfer Panel (desktop only) ─────────────────────────────────────
-function fmt(n: number) {
-  return new Intl.NumberFormat('en-PH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n)
-}
 
 function InlineTransferPanel({ wallets }: { wallets: WalletWithBalance[] }) {
   const { onModalSuccess } = useLayout()
@@ -103,7 +97,7 @@ function InlineTransferPanel({ wallets }: { wallets: WalletWithBalance[] }) {
   const [submitting, setSubmitting] = useState(false)
   const [error,      setError]      = useState<string | null>(null)
   const [success,    setSuccess]    = useState(false)
-
+  const { format } = useCurrency(); 
   // Keep defaults in sync if wallets load after mount
   useEffect(() => {
     if (!fromId && wallets[0]) setFromId(wallets[0].id)
@@ -205,7 +199,7 @@ function InlineTransferPanel({ wallets }: { wallets: WalletWithBalance[] }) {
         </select>
         {fromWallet && (
           <p className="daloy-hint" style={{ marginTop: '3px' }}>
-            Balance: {fromWallet.currency} {fmt(fromWallet.currentBalance ?? 0)}
+            Balance: {format(fromWallet.currentBalance ?? 0)}
           </p>
         )}
       </div>
