@@ -1,18 +1,13 @@
 import type { NetPosition } from '../../../services/wallet/walletService'
+import { useCurrency } from "../../../hooks/useCurrency";
 
 interface NetPositionCardProps {
   netPosition: NetPosition | null
   isLoading: boolean
 }
 
-function fmt(amount: number): string {
-  return new Intl.NumberFormat('en-PH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount)
-}
-
 export function NetPositionCard({ netPosition, isLoading }: NetPositionCardProps) {
+  const { format } = useCurrency(); // ← add
   return (
     <div
       className="rounded-xl p-5"
@@ -48,7 +43,7 @@ export function NetPositionCard({ netPosition, isLoading }: NetPositionCardProps
               className="text-[0.88rem] font-medium"
               style={{ color: 'var(--income)', fontFamily: 'IBM Plex Mono, monospace' }}
             >
-              ₱{fmt(netPosition.totalAssets)}
+              {format(netPosition.totalAssets)}
             </span>
           </div>
 
@@ -63,7 +58,7 @@ export function NetPositionCard({ netPosition, isLoading }: NetPositionCardProps
               className="text-[0.88rem] font-medium"
               style={{ color: 'var(--expense)', fontFamily: 'IBM Plex Mono, monospace' }}
             >
-              −₱{fmt(netPosition.totalOwed)}
+              −{format(netPosition.totalOwed)}
             </span>
           </div>
 
@@ -83,7 +78,7 @@ export function NetPositionCard({ netPosition, isLoading }: NetPositionCardProps
                 fontFamily: 'IBM Plex Mono, monospace',
               }}
             >
-              ₱{fmt(netPosition.net)}
+              {format(netPosition.net)}
             </span>
           </div>
         </div>

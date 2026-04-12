@@ -1,4 +1,5 @@
 import type { BudgetUsage } from '../../../types'
+import { useCurrency } from "../../../hooks/useCurrency";
 
 interface BudgetEnvelopesProps {
   envelopes: BudgetUsage[]
@@ -14,13 +15,6 @@ function getBarColor(percentUsed: number): string {
   return 'var(--forest-l)'
 }
 
-function fmt(amount: number): string {
-  return new Intl.NumberFormat('en-PH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
 export function BudgetEnvelopes({
   envelopes,
   isLoading,
@@ -28,6 +22,7 @@ export function BudgetEnvelopes({
   onTrackCount,
   totalEnvelopes,
 }: BudgetEnvelopesProps) {
+  const { format } = useCurrency(); 
   return (
     <div
       className="rounded-xl p-5"
@@ -101,7 +96,7 @@ export function BudgetEnvelopes({
                       fontFamily: 'IBM Plex Mono, monospace',
                     }}
                   >
-                    {fmt(envelope.spent)} / {fmt(envelope.amountLimit)}
+                    {format(envelope.spent)} / {format(envelope.amountLimit)}
                   </span>
                 </div>
 
@@ -125,8 +120,8 @@ export function BudgetEnvelopes({
                   }}
                 >
                   {isOver
-                    ? `Over by ₱${fmt(Math.abs(envelope.remaining))}`
-                    : `₱${fmt(envelope.remaining)} remaining`}
+                    ? `Over by ₱${format(Math.abs(envelope.remaining))}`
+                    : `₱${format(envelope.remaining)} remaining`}
                 </span>
               </div>
             )

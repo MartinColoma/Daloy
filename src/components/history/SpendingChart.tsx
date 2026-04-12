@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { BarDatum } from "../../lib/historyUtils";
-import { fmt } from "../../lib/historyUtils";
+import { useCurrency } from "../../hooks/useCurrency";
 
 // ── Tooltip ────────────────────────────────────────────────────────────────
 interface TooltipData {
@@ -12,6 +12,7 @@ interface TooltipData {
 
 function BarTooltip({ data }: { data: TooltipData }) {
   const net = data.income - data.expense;
+  const { format } = useCurrency(); 
   return (
     <div
       className="absolute z-50 pointer-events-none"
@@ -41,7 +42,7 @@ function BarTooltip({ data }: { data: TooltipData }) {
               In
             </span>
             <span className="font-mono text-[0.68rem]" style={{ color: "var(--income)" }}>
-              +{fmt(data.income)}
+              +{format(data.income)}
             </span>
           </div>
         )}
@@ -51,7 +52,7 @@ function BarTooltip({ data }: { data: TooltipData }) {
               Out
             </span>
             <span className="font-mono text-[0.68rem]" style={{ color: "var(--expense)" }}>
-              −{fmt(data.expense)}
+              −{format(data.expense)}
             </span>
           </div>
         )}
@@ -67,7 +68,7 @@ function BarTooltip({ data }: { data: TooltipData }) {
                 style={{ color: net >= 0 ? "var(--income)" : "var(--expense)" }}
               >
                 {net >= 0 ? "+" : "−"}
-                {fmt(net)}
+                {format(net)}
               </span>
             </div>
           </>

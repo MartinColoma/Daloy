@@ -1,20 +1,33 @@
+// 1. React core
 import { useState, useEffect, useCallback } from "react";
-import { ArrowRight, TrendingUp, TrendingDown, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
-import { Link } from "react-router-dom";
+
+// 2. Third-party libraries (UI / icons / external packages)
 import {
+  ArrowRight, TrendingUp, TrendingDown, AlertCircle,
+  ChevronDown, ChevronUp,
   ShoppingCart, Briefcase, ArrowLeftRight, Users,
   RefreshCcw, Handshake, SlidersHorizontal, Wallet
 } from "lucide-react";
+import { Link } from "react-router-dom";
+
+// 3. Global state / context / stores
 import { useAuthStore } from "../../stores/authStore";
 import { useLayout } from "../../layouts/LayoutContext";
+
+// 4. Custom hooks
 import { useMediaQuery } from "../../hooks/useMediaQuery";
-import type { ModalName } from "../../layouts/LayoutContext";
+import { useCurrency } from "../../hooks/useCurrency";
+
+// 5. Services (API / business logic)
 import {
   fetchHomeWallets,
   fetchHomeSummary,
   fetchRecentTransactions,
   fetchBudgetSnapshot,
 } from "../../services/home/homeService";
+
+// 6. Types / interfaces
+import type { ModalName } from "../../layouts/LayoutContext";
 import type {
   HomeWalletItem,
   RecentTransactionItem,
@@ -85,9 +98,7 @@ const QUICK_ACTIONS: { key: string; icon: React.ElementType; label: string; moda
 ];
 
 // ── Helpers ───────────────────────────────────────────────────
-function fmt(n: number): string {
-  return `₱${Math.abs(n).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
+
 
 function budgetColor(spent: number, limit: number): string {
   const pct = spent / limit;
@@ -177,12 +188,20 @@ function Skeleton({ className, style }: { className?: string; style?: React.CSSP
 // ═══════════════════════════════════════════════════════════════
 
 function TxnRow({ t, last }: { t: RecentTransactionItem; last: boolean }) {
+  const { format } = useCurrency(); // ← must be first, before any other logic
+
   const subtitleParts = [t.categoryName, t.walletName].filter(Boolean);
   if (t.originalCurrency && t.originalCurrency !== "PHP" && t.originalAmount) {
     subtitleParts.push(
       `${t.originalCurrency} ${Math.abs(t.originalAmount).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
     );
   }
+
+  const isIncome   = t.type === "income" || t.type === "settlement";
+  const isTransfer = t.type === "transfer";
+  const signedAmount = isTransfer
+    ? format(t.amount)
+    : format(t.type === "income" || t.type === "settlement" ? t.amount : -t.amount, { showSign: true });
 
   return (
     <div
@@ -207,18 +226,13 @@ function TxnRow({ t, last }: { t: RecentTransactionItem; last: boolean }) {
         <p
           className="font-mono text-[0.86rem] font-medium"
           style={{
-            color: t.type === "income" || t.type === "settlement"
-              ? "var(--income)"
-              : t.type === "transfer"
-              ? "var(--steel-m)"
-              : "var(--expense)",
+            color: isIncome ? "var(--income)" : isTransfer ? "var(--steel-m)" : "var(--expense)",
           }}
         >
-          {t.type === "income" || t.type === "settlement" ? "+" : t.type === "transfer" ? "" : "−"}
-          {fmt(t.amount)}
+          {signedAmount}
         </p>
         <p className="font-outfit text-[0.63rem]" style={{ color: "var(--ink4)" }}>
-          {t.type === "transfer" && t.toWalletName ? `${t.walletName} → ${t.toWalletName}` : t.walletName}
+          {isTransfer && t.toWalletName ? `${t.walletName} → ${t.toWalletName}` : t.walletName}
         </p>
       </div>
     </div>
@@ -298,6 +312,7 @@ function DesktopWalletsPanel({ wallets, loading }: {
   wallets: HomeWalletItem[];
   loading: boolean;
 }) {
+  const { format } = useCurrency(); // ← add
   const [expanded, setExpanded] = useState(false);
 
   const activeWallets  = wallets.filter(w => !w.isArchived);
@@ -313,7 +328,6 @@ function DesktopWalletsPanel({ wallets, loading }: {
           Manage <ArrowRight size={10} />
         </Link>
       </div>
-
       <div className="flex flex-col gap-1.5 p-2.5">
         {loading
           ? [...Array(3)].map((_, i) => <Skeleton key={i} style={{ height: "36px" }} />)
@@ -327,19 +341,14 @@ function DesktopWalletsPanel({ wallets, loading }: {
                   {w.icon} {w.name}
                 </p>
                 <p className="font-mono text-[0.78rem] font-medium text-white">
-                  {fmt(w.currentBalance)}
+                  {format(w.currentBalance)} {/* ← */}
                 </p>
               </div>
             ))
         }
       </div>
-
       {!loading && hiddenCount > 0 && (
-        <ShowMoreButton
-          expanded={expanded}
-          count={hiddenCount}
-          onClick={() => setExpanded(p => !p)}
-        />
+        <ShowMoreButton expanded={expanded} count={hiddenCount} onClick={() => setExpanded(p => !p)} />
       )}
     </div>
   );
@@ -351,6 +360,7 @@ function DesktopBudgetPanel({ budgets, overCount, loading }: {
   overCount: number;
   loading:   boolean;
 }) {
+  const { format } = useCurrency(); // ← add
   const [expanded, setExpanded] = useState(false);
 
   const sortedBudgets  = sortBudgets(budgets);
@@ -367,7 +377,6 @@ function DesktopBudgetPanel({ budgets, overCount, loading }: {
           </span>
         )}
       </div>
-
       <div className="flex flex-col gap-3 px-4 py-3">
         {loading
           ? [...Array(3)].map((_, i) => <Skeleton key={i} style={{ height: "48px" }} />)
@@ -384,27 +393,22 @@ function DesktopBudgetPanel({ budgets, overCount, loading }: {
                       {b.categoryIcon} {b.categoryName}
                     </span>
                     <span className="font-mono text-[0.62rem]" style={{ color: "var(--ink4)" }}>
-                      {fmt(b.spent)}/{fmt(b.amountLimit)}
+                      {format(b.spent)}/{format(b.amountLimit)} {/* ← */}
                     </span>
                   </div>
                   <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--bg3)" }}>
                     <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: color }} />
                   </div>
                   <p className="font-outfit text-[0.63rem]" style={{ color: isOver ? "var(--expense)" : "var(--ink4)" }}>
-                    {isOver ? `Over by ${fmt(b.spent - b.amountLimit)}` : `${fmt(b.remaining)} remaining`}
+                    {isOver ? `Over by ${format(b.spent - b.amountLimit)}` : `${format(b.remaining)} remaining`} {/* ← */}
                   </p>
                 </div>
               );
             })
         }
       </div>
-
       {!loading && hiddenCount > 0 && (
-        <ShowMoreButton
-          expanded={expanded}
-          count={hiddenCount}
-          onClick={() => setExpanded(p => !p)}
-        />
+        <ShowMoreButton expanded={expanded} count={hiddenCount} onClick={() => setExpanded(p => !p)} />
       )}
     </div>
   );
@@ -454,6 +458,7 @@ function DesktopQuickActions() {
 // ═══════════════════════════════════════════════════════════════
 
 function MobileBalanceHero({ summary, loading }: { summary: HomeSummaryResponse | null; loading: boolean }) {
+  const { format } = useCurrency(); // ← add
   const netFlow = summary ? summary.monthIncome - summary.monthExpense : 0;
   const isUp    = netFlow >= 0;
 
@@ -463,7 +468,7 @@ function MobileBalanceHero({ summary, loading }: { summary: HomeSummaryResponse 
         <p className="font-mono text-[0.57rem] tracking-[0.18em] uppercase" style={{ color: "rgba(255,255,255,0.38)" }}>Net Balance</p>
         {loading
           ? <Skeleton style={{ height: "36px", width: "160px", marginTop: "4px", background: "rgba(255,255,255,0.12)" }} />
-          : <p className="font-mono font-medium text-[2rem] leading-none mt-1 text-white">{fmt(summary?.netBalance ?? 0)}</p>
+          : <p className="font-mono font-medium text-[2rem] leading-none mt-1 text-white">{format(summary?.netBalance ?? 0)}</p>
         }
         {!loading && summary && (
           <div className="flex items-center gap-1 mt-1.5">
@@ -472,7 +477,7 @@ function MobileBalanceHero({ summary, loading }: { summary: HomeSummaryResponse 
               : <TrendingDown size={11} style={{ color: "var(--expense)" }} />
             }
             <span className="font-outfit text-[0.72rem]" style={{ color: isUp ? "var(--forest-xl)" : "var(--expense)" }}>
-              {isUp ? "+" : "−"}{fmt(Math.abs(summary.netFlowChange))} vs last month
+              {format(summary.netFlowChange, { showSign: true })} vs last month {/* ← replaces manual +/− + fmt */}
             </span>
           </div>
         )}
@@ -482,14 +487,14 @@ function MobileBalanceHero({ summary, loading }: { summary: HomeSummaryResponse 
           <p className="font-mono text-[0.52rem] tracking-[0.14em] uppercase" style={{ color: "rgba(255,255,255,0.32)" }}>Income</p>
           {loading
             ? <Skeleton style={{ height: "20px", width: "72px", marginTop: "4px", background: "rgba(255,255,255,0.12)" }} />
-            : <p className="font-mono font-medium text-[0.95rem] text-white mt-0.5">{fmt(summary?.monthIncome ?? 0)}</p>
+            : <p className="font-mono font-medium text-[0.95rem] text-white mt-0.5">{format(summary?.monthIncome ?? 0)}</p> 
           }
         </div>
         <div className="flex-1 rounded-[var(--radius-sm)] px-3 py-2.5" style={{ background: "rgba(255,255,255,0.07)" }}>
           <p className="font-mono text-[0.52rem] tracking-[0.14em] uppercase" style={{ color: "rgba(255,255,255,0.32)" }}>Expenses</p>
           {loading
             ? <Skeleton style={{ height: "20px", width: "72px", marginTop: "4px", background: "rgba(255,255,255,0.12)" }} />
-            : <p className="font-mono font-medium text-[0.95rem] text-white mt-0.5">{fmt(summary?.monthExpense ?? 0)}</p>
+            : <p className="font-mono font-medium text-[0.95rem] text-white mt-0.5">{format(summary?.monthExpense ?? 0)}</p>
           }
         </div>
       </div>
@@ -498,6 +503,8 @@ function MobileBalanceHero({ summary, loading }: { summary: HomeSummaryResponse 
 }
 
 function MobileWalletChips({ wallets, loading }: { wallets: HomeWalletItem[]; loading: boolean }) {
+  const { format } = useCurrency(); // ← add
+
   return (
     <div>
       <div className="flex items-center justify-between px-4 mb-2.5">
@@ -507,7 +514,7 @@ function MobileWalletChips({ wallets, loading }: { wallets: HomeWalletItem[]; lo
         </Link>
       </div>
       <div className="flex gap-2.5 overflow-x-auto px-4 pb-1" style={{ scrollbarWidth: "none" }} data-no-swipe>
-          {loading
+        {loading
           ? [...Array(3)].map((_, i) => (
               <div key={i} className="flex-shrink-0 rounded-[var(--radius-md)] animate-pulse" style={{ background: "var(--bg3)", minWidth: "130px", minHeight: "80px" }} />
             ))
@@ -521,7 +528,7 @@ function MobileWalletChips({ wallets, loading }: { wallets: HomeWalletItem[]; lo
                   {w.icon} {w.name}
                 </p>
                 <div>
-                  <p className="font-mono font-medium text-[0.95rem] leading-none text-white">{fmt(w.currentBalance)}</p>
+                  <p className="font-mono font-medium text-[0.95rem] leading-none text-white">{format(w.currentBalance)}</p> {/* ← */}
                   <p className="font-mono text-[0.55rem] mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>{w.currency}</p>
                 </div>
               </div>
@@ -538,6 +545,7 @@ function MobileBudgetBars({ budgets, overCount, loading }: {
   overCount: number;
   loading:   boolean;
 }) {
+  const { format } = useCurrency(); // ← add
   const [expanded, setExpanded] = useState(false);
 
   const sortedBudgets  = sortBudgets(budgets);
@@ -582,23 +590,21 @@ function MobileBudgetBars({ budgets, overCount, loading }: {
                           <span className="font-outfit text-[0.58rem] font-semibold px-1 py-0.5 rounded" style={{ background: "#FEE2E2", color: "var(--expense)" }}>OVER</span>
                         )}
                       </div>
-                      <span className="font-mono text-[0.65rem]" style={{ color: "var(--ink4)" }}>{fmt(b.spent)}/{fmt(b.amountLimit)}</span>
+                      <span className="font-mono text-[0.65rem]" style={{ color: "var(--ink4)" }}>
+                        {format(b.spent)}/{format(b.amountLimit)} {/* ← */}
+                      </span>
                     </div>
                     <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--bg3)" }}>
                       <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: color }} />
                     </div>
                     <p className="font-outfit text-[0.65rem] mt-1" style={{ color: isOver ? "var(--expense)" : "var(--ink4)" }}>
-                      {isOver ? `Over by ${fmt(b.spent - b.amountLimit)}` : `${fmt(b.remaining)} remaining`}
+                      {isOver ? `Over by ${format(b.spent - b.amountLimit)}` : `${format(b.remaining)} remaining`} {/* ← */}
                     </p>
                   </div>
                 );
               })}
               {!loading && hiddenCount > 0 && (
-                <ShowMoreButton
-                  expanded={expanded}
-                  count={hiddenCount}
-                  onClick={() => setExpanded(p => !p)}
-                />
+                <ShowMoreButton expanded={expanded} count={hiddenCount} onClick={() => setExpanded(p => !p)} />
               )}
             </>
         }
@@ -661,7 +667,7 @@ export default function HomePage() {
   }, []);
 
   const savingsRate = summary ? `${summary.savingsRate}%` : "—";
-
+  const { format } = useCurrency(); 
   // ── Desktop ─────────────────────────────────────────────────
   if (isDesktop) {
     return (
@@ -674,9 +680,9 @@ export default function HomePage() {
         </div>
 
         <div className="flex gap-3">
-          <StatCard label="Net Balance"      value={fmt(totalBalance)}              sub={summary ? `${summary.netFlowChange >= 0 ? "+" : ""}${fmt(summary.netFlowChange)} vs last month` : undefined} subColor={summary && summary.netFlowChange >= 0 ? "var(--income)" : "var(--expense)"} loading={loadingSummary || loadingWallets} />
-          <StatCard label="Income (Month)"   value={fmt(summary?.monthIncome  ?? 0)} loading={loadingSummary} />
-          <StatCard label="Expenses (Month)" value={fmt(summary?.monthExpense ?? 0)} loading={loadingSummary} />
+          <StatCard label="Net Balance"      value={format(totalBalance)}              sub={summary ? `${summary.netFlowChange >= 0 ? "+" : ""}${format(summary.netFlowChange)} vs last month` : undefined} subColor={summary && summary.netFlowChange >= 0 ? "var(--income)" : "var(--expense)"} loading={loadingSummary || loadingWallets} />
+          <StatCard label="Income (Month)"   value={format(summary?.monthIncome  ?? 0)} loading={loadingSummary} />
+          <StatCard label="Expenses (Month)" value={format(summary?.monthExpense ?? 0)} loading={loadingSummary} />
           <StatCard label="Savings Rate"     value={savingsRate} sub={summary && summary.savingsRate >= 20 ? "On track ✓" : "Target: 20%"} subColor="var(--forest)" loading={loadingSummary} />
         </div>
 

@@ -1,13 +1,5 @@
 import type { HistoryTransactionItem } from "../services/history/historyService";
 
-// ── Formatters ─────────────────────────────────────────────────────────────
-export function fmt(n: number): string {
-  return `₱${Math.abs(n).toLocaleString("en-PH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
 // ── Local-safe ISO helpers ─────────────────────────────────────────────────
 // IMPORTANT: Never use d.toISOString().slice(0,10) — it converts to UTC,
 // which in UTC+8 (PH) subtracts 8 hours and rolls back the date by one day.
