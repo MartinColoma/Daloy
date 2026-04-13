@@ -26,6 +26,7 @@ export interface RecentTransactionItem {
   originalCurrency: string | null;
   transactedAt:     string;          // ISO string — may be midnight if entered via date picker
   createdAt:        string;          // ISO string — actual DB insert time, used as sort tiebreaker
+  walletCurrency: string;
 }
 
 export interface RecentTransactionsResponse {

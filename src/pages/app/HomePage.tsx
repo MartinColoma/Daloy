@@ -188,20 +188,30 @@ function Skeleton({ className, style }: { className?: string; style?: React.CSSP
 // ═══════════════════════════════════════════════════════════════
 
 function TxnRow({ t, last }: { t: RecentTransactionItem; last: boolean }) {
-  const { format } = useCurrency(); // ← must be first, before any other logic
+  const { formatForeign, currency } = useCurrency();
+
+  const walletCurrency = t.walletCurrency ?? currency;
 
   const subtitleParts = [t.categoryName, t.walletName].filter(Boolean);
-  if (t.originalCurrency && t.originalCurrency !== "PHP" && t.originalAmount) {
-    subtitleParts.push(
-      `${t.originalCurrency} ${Math.abs(t.originalAmount).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
-    );
+  if (t.originalCurrency && t.originalCurrency !== currency && t.originalAmount) {
+    subtitleParts.push(formatForeign(Math.abs(t.originalAmount), t.originalCurrency));
   }
 
   const isIncome   = t.type === "income" || t.type === "settlement";
   const isTransfer = t.type === "transfer";
   const signedAmount = isTransfer
-    ? format(t.amount)
-    : format(t.type === "income" || t.type === "settlement" ? t.amount : -t.amount, { showSign: true });
+    ? (() => {
+        // FX transfer: source wallet holds originalCurrency (e.g. USD), show that amount
+        if (t.originalCurrency && t.originalAmount && t.originalCurrency !== currency) {
+          return formatForeign(Math.abs(t.originalAmount), t.originalCurrency);
+        }
+        return formatForeign(t.amount, walletCurrency);
+      })()
+    : formatForeign(
+        isIncome ? t.amount : -t.amount,
+        walletCurrency,
+        { showSign: true }
+      );
 
   return (
     <div
@@ -312,7 +322,7 @@ function DesktopWalletsPanel({ wallets, loading }: {
   wallets: HomeWalletItem[];
   loading: boolean;
 }) {
-  const { format } = useCurrency(); // ← add
+  const { formatForeign } = useCurrency();
   const [expanded, setExpanded] = useState(false);
 
   const activeWallets  = wallets.filter(w => !w.isArchived);
@@ -341,7 +351,7 @@ function DesktopWalletsPanel({ wallets, loading }: {
                   {w.icon} {w.name}
                 </p>
                 <p className="font-mono text-[0.78rem] font-medium text-white">
-                  {format(w.currentBalance)} {/* ← */}
+                  {formatForeign(w.currentBalance, w.currency)}
                 </p>
               </div>
             ))
@@ -503,7 +513,7 @@ function MobileBalanceHero({ summary, loading }: { summary: HomeSummaryResponse 
 }
 
 function MobileWalletChips({ wallets, loading }: { wallets: HomeWalletItem[]; loading: boolean }) {
-  const { format } = useCurrency(); // ← add
+  const { formatForeign } = useCurrency();
 
   return (
     <div>
@@ -528,7 +538,9 @@ function MobileWalletChips({ wallets, loading }: { wallets: HomeWalletItem[]; lo
                   {w.icon} {w.name}
                 </p>
                 <div>
-                  <p className="font-mono font-medium text-[0.95rem] leading-none text-white">{format(w.currentBalance)}</p> {/* ← */}
+                  <p className="font-mono font-medium text-[0.95rem] leading-none text-white">
+                    {formatForeign(w.currentBalance, w.currency)}
+                  </p>
                   <p className="font-mono text-[0.55rem] mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>{w.currency}</p>
                 </div>
               </div>

@@ -11,7 +11,7 @@ export function useCurrency() {
     symbol: getCurrencySymbol(currency),
     format: (amount: number, opts?: { compact?: boolean; showSign?: boolean }) =>
       formatCurrency(amount, currency, opts),
-    formatForeign: (amount: number, foreignCurrency: string) =>
-      formatCurrency(amount, foreignCurrency),
+    formatForeign: (amount: number, foreignCurrency: string, opts?: { compact?: boolean; showSign?: boolean }) =>
+      formatCurrency(amount, foreignCurrency, opts),
   };
 }
