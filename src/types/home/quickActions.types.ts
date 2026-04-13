@@ -37,11 +37,17 @@ export interface CreateExpenseRequest {
 }
 
 export interface CreateExpenseResponse {
-  id:          string;
-  type:        "expense";
-  amount:      number;
-  description: string;
+  id:           string;
+  type:         "expense";
+  amount:       number;
+  description:  string;
   transactedAt: string;
-  walletId:    string;
-  categoryId:  string;
+  walletId:     string;
+  categoryId:   string;
+}
+
+// ── POST /quick-actions/add-expense/bulk ────────────────────
+export interface CreateExpenseBulkResponse {
+  inserted: number;
+  items:    CreateExpenseResponse[];
 }

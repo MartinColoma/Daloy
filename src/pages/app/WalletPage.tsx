@@ -27,7 +27,7 @@ import { DebtSummary } from '../../components/wallet/groups/DebtSummary'
 import AddWalletModal      from '../../components/modals/QuickActions/AddWalletModal'
 import EditWalletModal     from '../../components/modals/wallet/accounts/EditWalletModal'
 import ArchiveWalletModal  from '../../components/modals/wallet/accounts/ArchiveWalletModal'
-import TransferModal from '../../components/modals/QuickActions/TransferModal'
+import TransferModal       from '../../components/modals/QuickActions/TransferModal'
 
 // ── Services ──────────────────────────────────────────────────────────────────
 import walletService from '../../services/wallet/walletService'
@@ -97,7 +97,8 @@ function InlineTransferPanel({ wallets }: { wallets: WalletWithBalance[] }) {
   const [submitting, setSubmitting] = useState(false)
   const [error,      setError]      = useState<string | null>(null)
   const [success,    setSuccess]    = useState(false)
-  const { format } = useCurrency(); 
+  const { format } = useCurrency()
+
   // Keep defaults in sync if wallets load after mount
   useEffect(() => {
     if (!fromId && wallets[0]) setFromId(wallets[0].id)
@@ -112,8 +113,9 @@ function InlineTransferPanel({ wallets }: { wallets: WalletWithBalance[] }) {
       })
     : ''
 
-  const fromWallet = wallets.find(w => w.id === fromId) ?? null
-  const toOptions  = wallets.filter(w => w.id !== fromId)
+  const fromWallet   = wallets.find(w => w.id === fromId) ?? null
+  const toOptions    = wallets.filter(w => w.id !== fromId)
+  const overBalance  = fromWallet !== null && numericAmount > (fromWallet.currentBalance ?? 0) && numericAmount > 0
 
   const handleKey = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace') {
@@ -130,7 +132,7 @@ function InlineTransferPanel({ wallets }: { wallets: WalletWithBalance[] }) {
 
   const isDisabled =
     !fromId || !toId || fromId === toId ||
-    !centStr || numericAmount <= 0 || submitting
+    !centStr || numericAmount <= 0 || overBalance || submitting
 
   const handleSubmit = async () => {
     if (isDisabled) return
@@ -240,10 +242,10 @@ function InlineTransferPanel({ wallets }: { wallets: WalletWithBalance[] }) {
             value={displayAmount}
             onKeyDown={handleKey}
             onChange={() => {}}
-            style={{ color: 'var(--steel)' }}
+            style={{ color: overBalance ? 'var(--expense)' : 'var(--steel)' }}
           />
         </div>
-        {fromWallet && numericAmount > (fromWallet.currentBalance ?? 0) && numericAmount > 0 && (
+        {overBalance && (
           <p style={{
             fontSize: '0.75rem',
             color: 'var(--expense)',
@@ -295,7 +297,7 @@ function AccountsSegment({ isDesktop }: { isDesktop: boolean }) {
   const { data: wallets = [], isLoading } = useWallets()
   const { data: netPosition, isLoading: netLoading } = useNetPosition()
 
-  const { setModalSuccessHandler } = useLayout()   // ← add this
+  const { setModalSuccessHandler } = useLayout()
 
   const { refetch: refetchWallets }     = useWallets()
   const { refetch: refetchNetPosition } = useNetPosition()
@@ -361,9 +363,13 @@ function AccountsSegment({ isDesktop }: { isDesktop: boolean }) {
         wallet={archiveTarget}
         onClose={() => setArchiveTarget(null)}
       />
-      {/* Transfer modal — mobile only */}
+      {/* Transfer modal — mobile only, sourceWallet pre-seeds From */}
       {!isDesktop && (
-        <TransferModal isOpen={transferSource !== null} onClose={() => setTransferSource(null)} allWallets={wallets} sourceWallet={transferSource} />
+        <TransferModal
+          isOpen={transferSource !== null}
+          onClose={() => setTransferSource(null)}
+          sourceWallet={transferSource}
+        />
       )}
     </>
   )
