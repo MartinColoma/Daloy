@@ -1,5 +1,4 @@
 import { useLayout } from "../../layouts/LayoutContext";
-import { useWalletStore } from "../../stores/walletStore";
 import {
   AddExpenseModal,
   LogIncomeModal,
@@ -41,7 +40,6 @@ import {
 
 export default function ModalManager() {
   const { activeModal, closeModal } = useLayout();
-  const wallets = useWalletStore((s) => s.wallets);
 
   return (
     <>
@@ -56,7 +54,6 @@ export default function ModalManager() {
       <TransferModal
         isOpen={activeModal === "transfer"}
         onClose={closeModal}
-        allWallets={wallets}
       />
       <GroupExpenseModal
         isOpen={activeModal === "group-expense"}
