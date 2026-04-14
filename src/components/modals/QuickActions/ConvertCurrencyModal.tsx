@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback } from "react";
 import { RefreshCcw, ArrowLeft, Search, AlertCircle, CheckCircle2 } from "lucide-react";
 import ModalShell from "../ModalShell";
-import { useCurrency } from "../../../hooks/useCurrency";
-import { useExchangeRates } from "../../../hooks/useExchangeRates";
+import { useCurrency } from "../../../hooks/currency/useCurrency";
+import { useExchangeRates } from "../../../hooks/currency/useExchangeRates";
 
 // ─── Supported currencies ─────────────────────────────────────────────────────
 const SUPPORTED_CURRENCIES = [
@@ -67,16 +67,6 @@ const SUPPORTED_CURRENCIES = [
 
 const PINNED_CODES = ["PHP", "USD", "EUR", "GBP"];
 const PRESETS = [1, 5, 10, 50, 100, 500, 1000];
-
-// ─── Conversion — API rates are USD-based ────────────────────────────────────
-function convertAmount(
-  amount: number,
-  from: string,
-  to: string,
-  rates: Record<string, number>,
-): number {
-  return (amount / (rates[from] ?? 1)) * (rates[to] ?? 1);
-}
 
 // ─── Cent-first helpers ───────────────────────────────────────────────────────
 function centStrToDisplay(centStr: string): string {
@@ -261,20 +251,26 @@ interface Props {
 
 export default function ConvertCurrencyModal({ isOpen, onClose }: Props) {
   const { currency: baseCurrency } = useCurrency();
-  const { data: liveRates, isLoading, isError, dataUpdatedAt } = useExchangeRates();
 
-  // null = converter view; "from"/"to" = picker sub-view
+  // ── State — must be declared BEFORE any hook that depends on them ───────────
   const [picker,  setPicker]  = useState<PickerTarget | null>(null);
   const [fromCur, setFromCur] = useState("USD");
   const [toCur,   setToCur]   = useState(baseCurrency);
   const [centStr, setCentStr] = useState("100"); // starts at 1.00
 
+  // ── Data fetching — fromCur is now defined above ────────────────────────────
+  // Rates are fetched with fromCur as the base, so rates[toCur] is the direct
+  // conversion rate — no cross-multiplication needed.
+  const { data: liveRates, isLoading, isError, dataUpdatedAt } = useExchangeRates(fromCur);
+
   const rates    = liveRates ?? {} as Record<string, number>;
   const hasRates = Object.keys(rates).length > 0;
 
   const numericAmount = centStrToNumber(centStr);
-  const result = hasRates ? convertAmount(numericAmount, fromCur, toCur, rates) : 0;
-  const rate   = hasRates ? convertAmount(1, fromCur, toCur, rates) : 0;
+
+  // Since the API base = fromCur, rates[toCur] is already the direct rate
+  const rate   = hasRates ? (rates[toCur] ?? 0) : 0;
+  const result = hasRates ? numericAmount * rate : 0;
 
   const lastUpdated = dataUpdatedAt
     ? new Date(dataUpdatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
@@ -299,6 +295,7 @@ export default function ConvertCurrencyModal({ isOpen, onClose }: Props) {
   const swap = () => {
     setFromCur(toCur);
     setToCur(fromCur);
+    // Convert the current result back into centStr so the display stays coherent
     setCentStr(numberToCentStr(result));
   };
 
@@ -522,36 +519,12 @@ export default function ConvertCurrencyModal({ isOpen, onClose }: Props) {
                     ? `Updated ${lastUpdated}`
                     : "Live rates"}
             </p>
-            {/* <p style={{ fontFamily: "Outfit, sans-serif", fontSize: "0.62rem", color: "var(--ink4)", margin: "1px 0 0" }}>
-              via ExchangeRate-API
-            </p> */}
             <p style={{ fontFamily: "Outfit, sans-serif", fontSize: "0.62rem", color: "var(--ink4)", margin: "1px 0 0" }}>
               via Frankfurter (ECB)
             </p>
           </div>
         </div>
 
-        {/* CTA: Log transaction hint */}
-        {/* <div style={{
-          padding: "10px 12px", borderRadius: "var(--radius-sm)",
-          background: "var(--bg2)", border: "1.5px solid var(--bg3)",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-        }}>
-          <p style={{ fontFamily: "Outfit, sans-serif", fontSize: "0.78rem", color: "var(--ink3)", margin: 0 }}>
-            Made a purchase in {fromCur}?
-          </p>
-          <button
-            onClick={onClose}
-            style={{
-              display: "flex", alignItems: "center", gap: "4px",
-              fontFamily: "Outfit, sans-serif", fontSize: "0.75rem", fontWeight: 500,
-              color: "var(--forest)", background: "transparent", border: "none",
-              cursor: "pointer", padding: 0,
-            }}
-          >
-            Log expense <ArrowRight size={11} strokeWidth={1.5} />
-          </button>
-        </div> */}
       </div>
     </ModalShell>
   );

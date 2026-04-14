@@ -8,7 +8,7 @@ import {
   getWeekLabel,
   getMonthLabel,
 } from "../../lib/historyUtils";
-import { useCurrency } from "../../hooks/useCurrency";
+import { useCurrency } from "../../hooks/currency/useCurrency";
 
 // ── View tab switcher ──────────────────────────────────────────────────────
 interface ViewTabsProps {

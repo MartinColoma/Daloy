@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { ShoppingCart, Plus, Trash2, Package, Receipt, RefreshCw } from "lucide-react";
 import ModalShell from "../ModalShell";
 import { useLayout } from "../../../layouts/LayoutContext";
-import { useExchangeRates } from "../../../hooks/useExchangeRates";
+import { useExchangeRates } from "../../../hooks/currency/useExchangeRates";
 import {
   fetchAddExpenseOptions,
   createExpense,
   createExpenseBulk,
-} from "../../../services/home/quickActionsService";
+} from "../../../services/quickActions/quickActionsService";
 import type {
   ExpenseCategoryOption,
   WalletOption,

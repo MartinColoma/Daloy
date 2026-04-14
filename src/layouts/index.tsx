@@ -1,4 +1,4 @@
-import { useIsDesktop } from "../hooks/useMediaQuery";
+import { useIsDesktop } from "../hooks/media/useMediaQuery";
 import DesktopLayout    from "./DesktopLayout";
 import MobileLayout     from "./MobileLayout";
 

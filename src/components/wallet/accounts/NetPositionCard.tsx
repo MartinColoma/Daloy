@@ -1,5 +1,5 @@
 import type { NetPosition } from '../../../services/wallet/walletService'
-import { useCurrency } from "../../../hooks/useCurrency";
+import { useCurrency } from "../../../hooks/currency/useCurrency";
 
 interface NetPositionCardProps {
   netPosition: NetPosition | null

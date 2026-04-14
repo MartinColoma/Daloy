@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { useAuthStore } from "../stores/authStore";
-import { authService } from "../services/auth/authService";
-import type { SignInPayload, SignUpPayload } from "../services/auth/authService";
+import { useAuthStore } from "../../stores/authStore";
+import { authService } from "../../services/auth/authService";
+import type { SignInPayload, SignUpPayload } from "../../services/auth/authService";
 
 export const useAuth = () => {
   const { user, tokens, isAuthenticated, setAuth, clearAuth } = useAuthStore();

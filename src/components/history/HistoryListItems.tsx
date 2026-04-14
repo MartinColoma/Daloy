@@ -1,7 +1,7 @@
 import { Search, X, TrendingUp, TrendingDown, ArrowLeftRight, Users, Handshake } from "lucide-react";
 import type { HistoryTransactionItem } from "../../services/history/historyService";
 import { type TypeFilter, TYPE_FILTERS } from "../../lib/historyUtils";
-import { useCurrency } from "../../hooks/useCurrency";
+import { useCurrency } from "../../hooks/currency/useCurrency";
 
 // ── Transaction type icon ──────────────────────────────────────────────────
 export function TxnTypeIcon({ type }: { type: HistoryTransactionItem["type"] }) {

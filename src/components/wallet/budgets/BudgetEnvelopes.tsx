@@ -1,5 +1,5 @@
 import type { BudgetUsage } from '../../../types'
-import { useCurrency } from "../../../hooks/useCurrency";
+import { useCurrency } from "../../../hooks/currency/useCurrency";
 
 interface BudgetEnvelopesProps {
   envelopes: BudgetUsage[]

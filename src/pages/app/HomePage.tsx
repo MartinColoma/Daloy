@@ -15,8 +15,8 @@ import { useAuthStore } from "../../stores/authStore";
 import { useLayout } from "../../layouts/LayoutContext";
 
 // 4. Custom hooks
-import { useMediaQuery } from "../../hooks/useMediaQuery";
-import { useCurrency } from "../../hooks/useCurrency";
+import { useMediaQuery } from "../../hooks/media/useMediaQuery";
+import { useCurrency } from "../../hooks/currency/useCurrency";
 
 // 5. Services (API / business logic)
 import {

@@ -5,9 +5,9 @@ import {
   PieChart, AlertTriangle, Check,
 } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../hooks/auth/useAuth";
 import { useLayout } from "../../layouts/LayoutContext";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { useMediaQuery } from "../../hooks/media/useMediaQuery";
 
 // ── Helpers ───────────────────────────────────────────────────
 function fmt(n: number): string {
