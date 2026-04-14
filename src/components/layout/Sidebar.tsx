@@ -4,7 +4,7 @@ import {
   Home, Wallet, History, User, Plus, LogOut, ChevronUp, Settings,
 } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../hooks/auth/useAuth";
 import { useLayout } from "../../layouts/LayoutContext";
 
 const NAV_ITEMS = [

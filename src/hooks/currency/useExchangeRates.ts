@@ -1,6 +1,6 @@
 // hooks/useExchangeRates.ts
 import { useQuery } from "@tanstack/react-query";
-import { getLatestRates } from "../services/currency/currencyService";
+import { getLatestRates } from "../../services/currency/currencyService";
 
 // hooks/useExchangeRates.ts
 export function useExchangeRates(base?: string) {

@@ -1,6 +1,6 @@
 // src/hooks/useCurrency.ts
-import { useAuthStore } from '../stores/authStore';
-import { formatCurrency, getCurrencySymbol } from '../lib/currencyUtils';
+import { useAuthStore } from '../../stores/authStore';
+import { formatCurrency, getCurrencySymbol } from '../../lib/currencyUtils';
 
 export function useCurrency() {
   // baseCurrency is already on user — populated at login via /api/auth/signin or oauth/callback

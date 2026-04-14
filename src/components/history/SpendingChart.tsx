@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { BarDatum } from "../../lib/historyUtils";
-import { useCurrency } from "../../hooks/useCurrency";
+import { useCurrency } from "../../hooks/currency/useCurrency";
 
 // ── Tooltip ────────────────────────────────────────────────────────────────
 interface TooltipData {

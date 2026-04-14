@@ -2,17 +2,17 @@ import { useState, useEffect, useCallback } from 'react'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 import { Plus, ArrowLeftRight } from 'lucide-react'
 import { useLayout } from '../../layouts/LayoutContext'
-import { useIsDesktop } from '../../hooks/useMediaQuery'
+import { useIsDesktop } from '../../hooks/media/useMediaQuery'
 
 // ── Stores ────────────────────────────────────────────────────────────────────
 import { useBudgetStore } from '../../stores/budgetStore'
 import { useGroupStore }  from '../../stores/groupStore'
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────
-import { useWallets, useNetPosition } from '../../hooks/home/useWallets'
-import { useBudgets }                 from '../../hooks/home/useBudgets'
-import { useGroups, useGroupBalance, useNetGroupPosition } from '../../hooks/home/useGroups'
-import { useCurrency } from "../../hooks/useCurrency";
+import { useWallets, useNetPosition } from '../../hooks/wallet/useWallets'
+import { useBudgets }                 from '../../hooks/wallet/useBudgets'
+import { useGroups, useGroupBalance, useNetGroupPosition } from '../../hooks/wallet/useGroups'
+import { useCurrency } from "../../hooks/currency/useCurrency";
 
 // ── Components — wallet/ ──────────────────────────────────────────────────────
 import { WalletTable }      from '../../components/wallet/accounts/WalletTable'

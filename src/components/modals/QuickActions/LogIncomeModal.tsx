@@ -1,61 +1,44 @@
-import { useState } from "react";
+// ============================================================
+// modals/LogIncomeModal.tsx
+// DB writes to: transactions (type='income')
+// ============================================================
+
 import { Briefcase } from "lucide-react";
 import ModalShell from "../ModalShell";
+import { useLogIncome } from "../../../hooks/quickActions/useLogIncome";
+import { formatCurrency } from "../../../lib/currencyUtils";
 
-/* ─────────────────────────────────────────────
-   LogIncomeModal.tsx
-   DB writes to: transactions (type='income')
-   Fields: wallet_id, category_id, amount,
-           original_amount, original_currency,
-           exchange_rate, description, transacted_at,
-           is_recurring
-───────────────────────────────────────────── */
-
-const MOCK_WALLETS = [
-  { id: "1", name: "BPI Jumpstart", icon: "🏦" },
-  { id: "2", name: "GCash",         icon: "💙" },
-  { id: "3", name: "Maya",          icon: "💚" },
-  { id: "4", name: "Cash",          icon: "💵" },
-];
-
-const INCOME_CATEGORIES = [
-  { id: "10", icon: "💼", name: "Freelance" },
-  { id: "11", icon: "🏢", name: "Salary" },
-  { id: "12", icon: "💰", name: "Business" },
-  { id: "13", icon: "📈", name: "Investment" },
-  { id: "14", icon: "🎁", name: "Gift" },
-  { id: "15", icon: "📦", name: "Other" },
-];
+// Common currencies for the currency selector
+const CURRENCY_OPTIONS = ["PHP", "USD", "EUR", "JPY", "GBP", "SGD", "AUD", "HKD"];
 
 interface Props {
-  isOpen: boolean;
+  isOpen:  boolean;
   onClose: () => void;
 }
 
 export default function LogIncomeModal({ isOpen, onClose }: Props) {
-  const [amount,      setAmount]      = useState("");
-  const [description, setDescription] = useState("");
-  const [walletId,    setWalletId]    = useState("1");
-  const [categoryId,  setCategoryId]  = useState("10");
-  const [date,        setDate]        = useState(new Date().toISOString().split("T")[0]);
-  const [isRecurring, setIsRecurring] = useState(false);
-  const [currency,    setCurrency]    = useState("PHP");
+  const {
+    form,
+    setField,
+    categories,
+    wallets,
+    optionsLoading,
+    baseCurrency,
+    exchangeRate,
+    convertedAmount,
+    needsConversion,
+    ratesLoading,
+    submit,
+    isValid,
+    isSubmitting,
+    isError,
+    error,
+  } = useLogIncome(onClose);
 
-  const handleSubmit = () => {
-    // TODO: call transactionService.createTransaction({
-    //   type: "income",
-    //   wallet_id: walletId,
-    //   category_id: categoryId,
-    //   amount: parseFloat(amount),
-    //   original_amount: parseFloat(amount),
-    //   original_currency: currency,
-    //   exchange_rate: 1,
-    //   description,
-    //   transacted_at: new Date(date).toISOString(),
-    //   is_recurring: isRecurring,
-    // });
-    onClose();
-  };
+  function handleSubmit() {
+    if (!isValid || isSubmitting) return;
+    submit();
+  }
 
   return (
     <ModalShell
@@ -68,45 +51,67 @@ export default function LogIncomeModal({ isOpen, onClose }: Props) {
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
-        {/* Amount */}
+        {/* Error banner */}
+        {isError && (
+          <div style={{
+            padding: "10px 12px",
+            background: "#fef2f2",
+            border: "1.5px solid #fca5a5",
+            borderRadius: "var(--radius-sm)",
+            fontFamily: "Outfit, sans-serif",
+            fontSize: "0.82rem",
+            color: "var(--expense)",
+          }}>
+            {error instanceof Error ? error.message : "Something went wrong. Please try again."}
+          </div>
+        )}
+
+        {/* Amount + Currency */}
         <div className="daloy-field">
           <label className="daloy-eyebrow">Amount Received</label>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <select
               className="daloy-select"
-              value={currency}
-              onChange={e => setCurrency(e.target.value)}
+              value={form.currency}
+              onChange={e => setField("currency", e.target.value)}
               style={{ width: "90px", flexShrink: 0 }}
             >
-              <option>PHP</option>
-              <option>USD</option>
-              <option>EUR</option>
+              {CURRENCY_OPTIONS.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
             </select>
             <input
               className="daloy-input-mono"
               type="number"
+              min="0"
+              step="0.01"
               placeholder="0.00"
-              value={amount}
-              onChange={e => setAmount(e.target.value)}
+              value={form.amount}
+              onChange={e => setField("amount", e.target.value)}
               style={{ color: "var(--income)" }}
             />
           </div>
-          {currency !== "PHP" && amount && (
-            <p className="daloy-hint">
-              ≈ ₱{(parseFloat(amount) * 57.8).toLocaleString("en-PH", { maximumFractionDigits: 2 })} PHP at today's rate
+
+          {/* Conversion preview — only when currency differs from base */}
+          {needsConversion && form.amount && (
+            <p className="daloy-hint" style={{ marginTop: "6px" }}>
+              {ratesLoading
+                ? "Fetching today's rate…"
+                : `≈ ${formatCurrency(convertedAmount, baseCurrency)} at ${exchangeRate.toFixed(4)} ${baseCurrency}/${form.currency}`
+              }
             </p>
           )}
         </div>
 
-        {/* Source / description */}
+        {/* Description */}
         <div className="daloy-field">
           <label className="daloy-label">Source / Description</label>
           <input
             className="daloy-input"
             type="text"
             placeholder="e.g. Freelance — Acme Corp"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
+            value={form.description}
+            onChange={e => setField("description", e.target.value)}
           />
         </div>
 
@@ -114,19 +119,35 @@ export default function LogIncomeModal({ isOpen, onClose }: Props) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
           <div className="daloy-field">
             <label className="daloy-label">Category</label>
-            <select className="daloy-select" value={categoryId} onChange={e => setCategoryId(e.target.value)}>
-              {INCOME_CATEGORIES.map(c => (
-                <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
-              ))}
-            </select>
+            {optionsLoading ? (
+              <div className="daloy-select" style={{ color: "var(--ink4)" }}>Loading…</div>
+            ) : (
+              <select
+                className="daloy-select"
+                value={form.categoryId}
+                onChange={e => setField("categoryId", e.target.value)}
+              >
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                ))}
+              </select>
+            )}
           </div>
           <div className="daloy-field">
             <label className="daloy-label">To Wallet</label>
-            <select className="daloy-select" value={walletId} onChange={e => setWalletId(e.target.value)}>
-              {MOCK_WALLETS.map(w => (
-                <option key={w.id} value={w.id}>{w.icon} {w.name}</option>
-              ))}
-            </select>
+            {optionsLoading ? (
+              <div className="daloy-select" style={{ color: "var(--ink4)" }}>Loading…</div>
+            ) : (
+              <select
+                className="daloy-select"
+                value={form.walletId}
+                onChange={e => setField("walletId", e.target.value)}
+              >
+                {wallets.map(w => (
+                  <option key={w.id} value={w.id}>{w.icon} {w.name}</option>
+                ))}
+              </select>
+            )}
           </div>
         </div>
 
@@ -136,8 +157,8 @@ export default function LogIncomeModal({ isOpen, onClose }: Props) {
           <input
             className="daloy-input"
             type="date"
-            value={date}
-            onChange={e => setDate(e.target.value)}
+            value={form.date}
+            onChange={e => setField("date", e.target.value)}
           />
         </div>
 
@@ -152,18 +173,26 @@ export default function LogIncomeModal({ isOpen, onClose }: Props) {
           border: "1.5px solid var(--bg3)",
         }}>
           <div>
-            <p style={{ fontFamily: "Outfit, sans-serif", fontSize: "0.85rem", fontWeight: 500, color: "var(--ink2)", margin: 0 }}>
+            <p style={{
+              fontFamily: "Outfit, sans-serif",
+              fontSize: "0.85rem",
+              fontWeight: 500,
+              color: "var(--ink2)",
+              margin: 0,
+            }}>
               Recurring income
             </p>
-            <p className="daloy-hint" style={{ marginTop: 2 }}>Repeats on the same day each month</p>
+            <p className="daloy-hint" style={{ marginTop: 2 }}>
+              Repeats on the same day each month
+            </p>
           </div>
           <button
-            onClick={() => setIsRecurring(!isRecurring)}
+            onClick={() => setField("isRecurring", !form.isRecurring)}
             style={{
               width: "42px",
               height: "24px",
               borderRadius: "100px",
-              background: isRecurring ? "var(--income)" : "var(--bg3)",
+              background: form.isRecurring ? "var(--income)" : "var(--bg3)",
               border: "none",
               cursor: "pointer",
               position: "relative",
@@ -174,7 +203,7 @@ export default function LogIncomeModal({ isOpen, onClose }: Props) {
             <span style={{
               position: "absolute",
               top: "3px",
-              left: isRecurring ? "21px" : "3px",
+              left: form.isRecurring ? "21px" : "3px",
               width: "18px",
               height: "18px",
               borderRadius: "100px",
@@ -187,21 +216,29 @@ export default function LogIncomeModal({ isOpen, onClose }: Props) {
 
         {/* Actions */}
         <div style={{ display: "flex", gap: "10px", paddingTop: "4px" }}>
-          <button className="daloy-btn-ghost" onClick={onClose} style={{ flex: "0 0 auto" }}>
+          <button
+            className="daloy-btn-ghost"
+            onClick={onClose}
+            style={{ flex: "0 0 auto" }}
+            disabled={isSubmitting}
+          >
             Cancel
           </button>
           <button
             className="daloy-btn-primary"
             onClick={handleSubmit}
-            disabled={!amount || !description}
+            disabled={!isValid || isSubmitting}
             style={{
-              background: !amount || !description ? "var(--bg3)" : "var(--income)",
-              color: !amount || !description ? "var(--ink4)" : "white",
+              flex: 1,
+              background: !isValid || isSubmitting ? "var(--bg3)" : "var(--income)",
+              color:      !isValid || isSubmitting ? "var(--ink4)" : "white",
+              cursor:     !isValid || isSubmitting ? "not-allowed" : "pointer",
             }}
           >
-            Log Income
+            {isSubmitting ? "Logging…" : "Log Income"}
           </button>
         </div>
+
       </div>
     </ModalShell>
   );

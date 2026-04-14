@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useLayout } from "../../layouts/LayoutContext";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { useMediaQuery } from "../../hooks/media/useMediaQuery";
 import {
   getHistoryForDay,
   getHistoryForWeek,

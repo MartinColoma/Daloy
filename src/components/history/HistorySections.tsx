@@ -4,7 +4,7 @@ import { TxnRow, Skeleton, EmptyHistory, SearchBar, TypePills } from "./HistoryL
 import { formatDayEyebrow, getDayTotals, groupByDay } from "../../lib/historyUtils";
 import type { ViewMode, TypeFilter, BarDatum } from "../../lib/historyUtils";
 import type { HistoryTransactionItem, HistoryPeriodSummary } from "../../services/history/historyService";
-import { useCurrency } from "../../hooks/useCurrency";
+import { useCurrency } from "../../hooks/currency/useCurrency";
 
 // ── Chart + summary card ───────────────────────────────────────────────────
 interface ChartBlockProps {
