@@ -93,18 +93,35 @@ export default function LandingPage() {
   }, []);
 
   return (
+    // NOTE: use overflow-x: clip (NOT hidden) — "hidden" creates a scroll container
+    // that breaks position:fixed children. "clip" prevents horizontal overflow
+    // without creating a new scroll context.
     <div
-      className="min-h-screen overflow-x-hidden font-outfit"
-      style={{ background: "var(--bg)", color: "var(--ink)" }}
+      className="min-h-screen font-outfit"
+      style={{ background: "var(--bg)", color: "var(--ink)", overflowX: "clip" }}
     >
 
-      {/* ── Nav ── */}
+      {/* ── Nav — fixed, glassmorphic pill ── */}
       <nav
-        className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-3.5 md:py-4 border-b transition-all duration-200"
+        className="fixed z-50 flex items-center justify-between px-5 md:px-7 py-3 md:py-3.5 border transition-all duration-300"
         style={{
-          background: scrolled ? "var(--bg)" : "var(--bg)",
-          borderColor: scrolled ? "var(--bg3)" : "transparent",
-          boxShadow: scrolled ? "var(--shadow-sm)" : "none",
+          // Positioned as a floating pill with gutters on both sides
+          top: "16px",
+          left: "16px",
+          right: "16px",
+          borderRadius: "var(--radius-xl)",
+          // Glass effect: semi-transparent bg + blur
+          background: scrolled
+            ? "rgba(245, 243, 239, 0.82)"
+            : "rgba(245, 243, 239, 0.65)",
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
+          borderColor: scrolled
+            ? "rgba(228, 224, 216, 0.8)"
+            : "rgba(228, 224, 216, 0.5)",
+          boxShadow: scrolled
+            ? "0 4px 24px rgba(28, 26, 23, 0.10), 0 1px 0 rgba(255,255,255,0.7) inset"
+            : "0 2px 12px rgba(28, 26, 23, 0.06), 0 1px 0 rgba(255,255,255,0.6) inset",
         }}
       >
         {/* Logo — icon + wordmark */}
@@ -175,8 +192,8 @@ export default function LandingPage() {
       {/* ── Mobile menu drawer ── */}
       {mobileMenuOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 flex flex-col pt-[60px]"
-          style={{ background: "var(--bg)" }}
+          className="md:hidden fixed inset-0 z-40 flex flex-col"
+          style={{ background: "var(--bg)", paddingTop: "72px" }}
         >
           <div
             className="flex flex-col px-6 py-8 gap-6 border-b"
@@ -196,6 +213,9 @@ export default function LandingPage() {
           </div>
         </div>
       )}
+
+      {/* ── Spacer to push content below the fixed nav ── */}
+      <div style={{ height: "80px" }} aria-hidden="true" />
 
       {/* ── Hero ── */}
       <section className="relative max-w-[900px] mx-auto px-6 md:px-8 pt-14 md:pt-24 pb-10 md:pb-16 text-center overflow-hidden">
@@ -328,11 +348,6 @@ export default function LandingPage() {
       </div>
 
       {/* ── Filipino Color Band — subtle sash motif ── */}
-      {/*
-        The Philippine flag colors (blue, red, white) rendered as a
-        very thin decorative accent strip, paying homage to Filipino roots.
-        Kept extremely subtle to not clash with the Slate & Sage palette.
-      */}
       <div className="flex h-[3px]" aria-hidden="true">
         <div className="flex-1" style={{ background: "var(--steel-m)", opacity: 0.45 }} />
         <div className="flex-1" style={{ background: "var(--bg3)", opacity: 0.7 }} />
