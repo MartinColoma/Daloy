@@ -16,9 +16,6 @@ function fmt(amount: number): string {
   }).format(amount)
 }
 
-/* ==============================
-   ROW COMPONENT (isolated state)
-   ============================== */
 function WalletRow({
   wallet,
   isFirst,
@@ -27,15 +24,14 @@ function WalletRow({
   onArchive,
   onTransfer,
 }: {
-  wallet: WalletWithBalance
-  isFirst: boolean
-  isLast: boolean
-  onEdit: (wallet: WalletWithBalance) => void
-  onArchive: (wallet: WalletWithBalance) => void
+  wallet:     WalletWithBalance
+  isFirst:    boolean
+  isLast:     boolean
+  onEdit:     (wallet: WalletWithBalance) => void
+  onArchive:  (wallet: WalletWithBalance) => void
   onTransfer?: (wallet: WalletWithBalance) => void
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-
   const closeMenu = () => setIsMenuOpen(false)
 
   type MenuItem = {
@@ -86,8 +82,6 @@ function WalletRow({
           : isLast
           ? '0 0 var(--radius-md) var(--radius-md)'
           : 0,
-        position: 'relative',
-        zIndex: isMenuOpen ? 30 : 1,
         transition: 'background 0.12s',
       }}
       onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg)')}
@@ -95,67 +89,53 @@ function WalletRow({
     >
       {/* Wallet name */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-        <span
-          style={{
-            fontSize: '1.15rem',
-            lineHeight: 1,
-            flexShrink: 0,
-            width: '28px',
-            textAlign: 'center',
-          }}
-        >
+        <span style={{ fontSize: '1.15rem', lineHeight: 1, flexShrink: 0, width: '28px', textAlign: 'center' }}>
           {wallet.icon}
         </span>
-        <span
-          style={{
-            fontFamily: 'Outfit, sans-serif',
-            fontSize: '0.88rem',
-            fontWeight: 500,
-            color: 'var(--ink)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
+        <span style={{
+          fontFamily: 'Outfit, sans-serif',
+          fontSize: '0.88rem',
+          fontWeight: 500,
+          color: 'var(--ink)',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>
           {wallet.name}
         </span>
       </div>
 
       {/* Currency */}
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          fontFamily: 'IBM Plex Mono, monospace',
-          fontSize: '0.7rem',
-          fontWeight: 500,
-          letterSpacing: '0.06em',
-          color: 'var(--ink3)',
-          background: 'var(--bg2)',
-          borderRadius: '4px',
-          padding: '2px 7px',
-          width: 'fit-content',
-        }}
-      >
+      <span style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        fontFamily: 'IBM Plex Mono, monospace',
+        fontSize: '0.7rem',
+        fontWeight: 500,
+        letterSpacing: '0.06em',
+        color: 'var(--ink3)',
+        background: 'var(--bg2)',
+        borderRadius: '4px',
+        padding: '2px 7px',
+        width: 'fit-content',
+      }}>
         {wallet.currency}
       </span>
 
       {/* Balance */}
-      <span
-        style={{
-          fontFamily: 'IBM Plex Mono, monospace',
-          fontSize: '0.9rem',
-          fontWeight: 500,
-          color: (wallet.currentBalance ?? 0) >= 0 ? 'var(--income)' : 'var(--expense)',
-          textAlign: 'right',
-          letterSpacing: '0.02em',
-        }}
-      >
+      <span style={{
+        fontFamily: 'IBM Plex Mono, monospace',
+        fontSize: '0.9rem',
+        fontWeight: 500,
+        color: (wallet.currentBalance ?? 0) >= 0 ? 'var(--income)' : 'var(--expense)',
+        textAlign: 'right',
+        letterSpacing: '0.02em',
+      }}>
         {fmt(wallet.currentBalance ?? 0)}
       </span>
 
-      {/* Actions */}
-      <div style={{ position: 'relative', width: '32px' }}>
+      {/* Actions — zIndex ONLY on this cell, not the whole row */}
+      <div style={{ position: 'relative', width: '32px', zIndex: isMenuOpen ? 30 : 'auto' }}>
         <button
           onClick={() => setIsMenuOpen(prev => !prev)}
           style={{
@@ -176,27 +156,22 @@ function WalletRow({
 
         {isMenuOpen && (
           <>
-            {/* Backdrop (scoped per row but still works fine) */}
             <div
               style={{ position: 'fixed', inset: 0, zIndex: 20 }}
               onClick={closeMenu}
             />
-
-            {/* Dropdown */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '38px',
-                right: 0,
-                zIndex: 40,
-                background: '#FFFFFF',
-                border: '1.5px solid var(--bg3)',
-                borderRadius: 'var(--radius-md)',
-                boxShadow: 'var(--shadow-md)',
-                minWidth: '164px',
-                overflow: 'hidden',
-              }}
-            >
+            <div style={{
+              position: 'absolute',
+              top: '38px',
+              right: 0,
+              zIndex: 40,
+              background: '#FFFFFF',
+              border: '1.5px solid var(--bg3)',
+              borderRadius: 'var(--radius-md)',
+              boxShadow: 'var(--shadow-md)',
+              minWidth: '164px',
+              overflow: 'hidden',
+            }}>
               {menuItems.map(item => (
                 <button
                   key={item.label}
@@ -231,43 +206,46 @@ function WalletRow({
   )
 }
 
-/* ==============================
-   TABLE COMPONENT
-   ============================== */
 export function WalletTable({ wallets, onEdit, onArchive, onTransfer }: WalletTableProps) {
   const totalBalance = wallets.reduce((sum, w) => sum + (w.currentBalance ?? 0), 0)
 
   return (
     <div style={{ width: '100%' }}>
       {/* Header */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr 1.4fr auto',
-          alignItems: 'center',
-          padding: '6px 16px',
-          gap: '12px',
-        }}
-      >
-        <span style={{ fontFamily: 'IBM Plex Mono', fontSize: '0.62rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink4)' }}>
-          Wallet
-        </span>
-        <span style={{ fontFamily: 'IBM Plex Mono', fontSize: '0.62rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink4)' }}>
-          Currency
-        </span>
-        <span style={{ fontFamily: 'IBM Plex Mono', fontSize: '0.62rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink4)', textAlign: 'right' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '2fr 1fr 1.4fr auto',
+        alignItems: 'center',
+        padding: '6px 16px',
+        gap: '12px',
+      }}>
+        {(['Wallet', 'Currency'] as const).map((label, i) => (
+          <span key={label} style={{
+            fontFamily: 'IBM Plex Mono',
+            fontSize: '0.62rem',
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: 'var(--ink4)',
+            ...(i === 1 ? {} : {}),
+          }}>
+            {label}
+          </span>
+        ))}
+        <span style={{
+          fontFamily: 'IBM Plex Mono',
+          fontSize: '0.62rem',
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          color: 'var(--ink4)',
+          textAlign: 'right',
+        }}>
           Balance
         </span>
         <span style={{ width: '32px' }} />
       </div>
 
       {/* Rows */}
-      <div
-        style={{
-          border: '1.5px solid var(--bg3)',
-          borderRadius: 'var(--radius-md)',
-        }}
-      >
+      <div style={{ border: '1.5px solid var(--bg3)', borderRadius: 'var(--radius-md)' }}>
         {wallets.map((wallet, i) => (
           <WalletRow
             key={wallet.id}
@@ -281,38 +259,27 @@ export function WalletTable({ wallets, onEdit, onArchive, onTransfer }: WalletTa
         ))}
 
         {/* Total */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr 1.4fr auto',
-            alignItems: 'center',
-            padding: '11px 16px',
-            gap: '12px',
-            background: 'var(--forest-bg)',
-            borderTop: '2px solid var(--forest-xl)',
-            borderRadius: '0 0 var(--radius-md) var(--radius-md)',
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'Outfit, sans-serif',
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              color: 'var(--forest)',
-            }}
-          >
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '2fr 1fr 1.4fr auto',
+          alignItems: 'center',
+          padding: '11px 16px',
+          gap: '12px',
+          background: 'var(--forest-bg)',
+          borderTop: '2px solid var(--forest-xl)',
+          borderRadius: '0 0 var(--radius-md) var(--radius-md)',
+        }}>
+          <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.82rem', fontWeight: 600, color: 'var(--forest)' }}>
             Total
           </span>
           <span />
-          <span
-            style={{
-              fontFamily: 'IBM Plex Mono',
-              fontSize: '0.95rem',
-              fontWeight: 500,
-              color: 'var(--forest)',
-              textAlign: 'right',
-            }}
-          >
+          <span style={{
+            fontFamily: 'IBM Plex Mono',
+            fontSize: '0.95rem',
+            fontWeight: 500,
+            color: 'var(--forest)',
+            textAlign: 'right',
+          }}>
             {fmt(totalBalance)}
           </span>
           <span style={{ width: '32px' }} />
